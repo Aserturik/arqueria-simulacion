@@ -1,4 +1,4 @@
-from ..modelos.equipo import Equipo
+from .equipo import Equipo
 from .ronda import Ronda
 
 class Juego:
