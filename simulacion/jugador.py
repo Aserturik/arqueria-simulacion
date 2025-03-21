@@ -11,6 +11,7 @@ class Jugador:
         self.rondas_ganadas = 0
         self.puntaje_total = 0
         self.cansancio_acumulado = 0
+        self.tiros_realizados = 0
 
     def _generar_habilidades(self):
         # Generamos y guardamos los valores iniciales
@@ -48,8 +49,8 @@ class Jugador:
     def realizar_tiro(self):
         if self.resistencia >= 5:
             self.resistencia -= 5
+            self.tiros_realizados += 1
             # Calcula el puntaje basado en resistencia, experiencia y suerte
-            puntaje = random.randint(1, 10)
-            return puntaje
+            return True
         else:
-            raise ValueError("Resistencia insuficiente para realizar el tiro")
+            return False
