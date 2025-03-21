@@ -1,16 +1,19 @@
 from .jugador import Jugador
 import random
 import names
-
+import uuid
 
 class Equipo:
     def __init__(self, nombre, genero, num_jugadores=5):
+        self.equipo_id = str(uuid.uuid4()) 
         self.nombre = nombre
         self.genero = genero.upper()  # 'M' o 'F'
         if self.genero not in ["M", "F"]:
             raise ValueError("El género debe ser 'M' o 'F'")
         self.jugadores = self._generar_jugadores(num_jugadores)
+        self.rondas_ganadas = 0
         self.puntaje_total = 0
+        self.juegos_ganados = 0
         self.jugadores_por_id = {jugador.user_id: jugador for jugador in self.jugadores}
 
     def _generar_jugadores(self, num_jugadores):
@@ -35,6 +38,7 @@ class Equipo:
 
     def obtener_estadisticas(self):
         return {
+            "equipo_id": self.equipo_id,
             "nombre_equipo": self.nombre,
             "puntaje_total": self.puntaje_total,
             "jugadores": [
