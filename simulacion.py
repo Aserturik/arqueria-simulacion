@@ -30,23 +30,20 @@ class Juego:
         # Equipo 1 juega
         print(f"\nEquipo {self.equipo1.nombre} (Masculino):")
         for i, jugador in enumerate(self.equipo1.jugadores):
-            print(f"  Debug - Procesando jugador: {jugador.nombre}")
-            print(f"  Debug - Resistencia inicial: {jugador.resistencia}")
             puntaje_jugador = 0
             tiros_realizados = 0
 
             print(f"  {jugador.nombre} - ", end="")
             while jugador.resistencia >= 5:
-                try:
-                    print(f"Debug - Intento tiro, resistencia: {jugador.resistencia}")
-                    puntaje = self.blanco.realizar_tiro(jugador)
-                    print(f"Debug - Puntaje obtenido: {puntaje}")
-                    puntaje_jugador += puntaje
-                    tiros_realizados += 1
-                    print(f"Debug - Resistencia después: {jugador.resistencia}")
-                except Exception as e:
-                    print(f"ERROR: {str(e)}")
-                    break
+                puntaje = self.blanco.realizar_tiro(jugador)
+                puntaje_jugador += puntaje
+                tiros_realizados += 1
+
+            print(f"Puntaje: {puntaje_jugador} ({tiros_realizados} tiros)")
+            jugador.puntaje_total += puntaje_jugador
+            resultado_ronda["equipo1"]["puntaje"] += puntaje_jugador
+            resultado_ronda["equipo1"]["tiros"] += tiros_realizados
+            jugador.finalizar_ronda()
 
         # Equipo 2 juega
         print(f"\nEquipo {self.equipo2.nombre} (Femenino):")
@@ -152,6 +149,6 @@ class Juego:
 # Ejecutar la simulación
 if __name__ == "__main__":
     juego = Juego(
-        "Arqueros del Norte", "Arqueras del Sur", num_jugadores=5, num_rondas=1
+        "Arqueros del Norte", "Arqueras del Sur", num_jugadores=5, num_rondas=10
     )
     juego.jugar_partida_completa()
