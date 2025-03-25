@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+simulacion_data.json
 
 # C extensions
 *.so

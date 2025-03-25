@@ -8,15 +8,49 @@
     <h1>Resultados del Juego</h1>
     <p>{{ resultado_final }}</p>
 
-    <h2>Evolución de puntajes por ronda</h2>
-    <img src="data:image/png;base64,{{ imagen.evolucion }}" alt="Gráfica de evolución">
+    <h2>Estadísticas por Ronda</h2>
+    <table border="1" cellspacing="0" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Ronda</th>
+                <th>{{ simulacion_data.equipo1.nombre }} (Puntos)</th>
+                <th>{{ simulacion_data.equipo2.nombre }} (Puntos)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ronda in simulacion_data.historial_puntajes %}
+            <tr>
+                <td>{{ ronda.ronda }}</td>
+                <td>{{ ronda.equipo1.puntaje }}</td>
+                <td>{{ ronda.equipo2.puntaje }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-    <h2>Puntaje Total Final</h2>
-    <img src="data:image/png;base64,{{ imagen.final }}" alt="Gráfica final">
+    <h2>Resumen Final</h2>
+    <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+            <th>Equipo</th>
+            <th>Rondas Ganadas</th>
+            <th>Puntaje Total</th>
+        </tr>
+        <tr>
+            <td>{{ simulacion_data.equipo1.nombre }}</td>
+            <td>{{ simulacion_data.equipo1.rondas_ganadas }}</td>
+            <td>{{ simulacion_data.equipo1.puntaje_total }}</td>
+        </tr>
+        <tr>
+            <td>{{ simulacion_data.equipo2.nombre }}</td>
+            <td>{{ simulacion_data.equipo2.rondas_ganadas }}</td>
+            <td>{{ simulacion_data.equipo2.puntaje_total }}</td>
+        </tr>
+    </table>
 
-    <h2>Visualización del Blanco</h2>
-    <img src="data:image/png;base64,{{ imagen.blanco }}" alt="Blanco con disparos">
-
+    <form action="{{ url_for('graficas') }}" method="get">
+        <input type="hidden" name="game_id" value="{{ simulacion_data.id_juego }}">
+        <button type="submit">Generar Gráficas</button>
+    </form>
     <br>
     <a href="{{ url_for('index') }}">Volver</a>
 </body>
