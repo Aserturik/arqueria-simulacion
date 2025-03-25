@@ -7,8 +7,16 @@
 <body>
     <h1>Resultados del Juego</h1>
     <p>{{ resultado_final }}</p>
+
     <h2>Evolución de puntajes por ronda</h2>
-    <img src="data:image/png;base64,{{ imagen }}" alt="Gráfica de puntajes">
+    <img src="data:image/png;base64,{{ imagen.evolucion }}" alt="Gráfica de evolución">
+
+    <h2>Puntaje Total Final</h2>
+    <img src="data:image/png;base64,{{ imagen.final }}" alt="Gráfica final">
+
+    <h2>Visualización del Blanco</h2>
+    <img src="data:image/png;base64,{{ imagen.blanco }}" alt="Blanco con disparos">
+
     <br>
     <a href="{{ url_for('index') }}">Volver</a>
 </body>
