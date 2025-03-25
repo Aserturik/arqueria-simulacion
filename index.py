@@ -66,7 +66,7 @@ def jugar():
             "puntaje_total": juego.equipo2.puntaje_total,
         },
         "blanco": {
-            "tiros": juego.blanco.tiros,
+            "tiros": juego.blanco.obtener_tiros_serializables(),
             "RADIO_CENTRAL": juego.blanco.RADIO_CENTRAL,
             "RADIO_INTERMEDIA": juego.blanco.RADIO_INTERMEDIA,
             "RADIO_EXTERIOR": juego.blanco.RADIO_EXTERIOR,
