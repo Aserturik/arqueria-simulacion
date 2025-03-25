@@ -38,7 +38,7 @@ class Ronda:
     def _jugar_turno_equipo(self, equipo, clave_equipo):
         for jugador in equipo.jugadores:
             puntaje, tiros = 0, 0
-            while jugador.resistencia_actual >= 5:
+            while jugador.puede_tirar():
                 puntaje += self.blanco.realizar_tiro(jugador)
                 tiros += 1
             self.resultado[clave_equipo]["puntaje"] += puntaje

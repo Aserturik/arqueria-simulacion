@@ -5,111 +5,122 @@ from typing import List, Dict
 
 
 @dataclass
-class Tiro:
+class Lanzamiento:
+    coordenadas: List[float]
+    zona: int
+    puntaje: int
+
+
+@dataclass
+class JugadorTiros:
     jugador_id: str
     nombre: str
     genero: str
-    zona: str  # Nombre de la zona (ej: "CENTRAL")
-    puntaje: int  # Puntaje numérico (10, 9, 8, 0)
-    coordenadas: List[float]
+    lanzamientos: List[Lanzamiento]
 
 
 class Blanco:
-    # Mapeo zona -> puntaje
-    ZONAS_PUNTAJE = {
-        "CENTRAL": 10,
-        "INTERMEDIA": 9,
-        "EXTERIOR": 8,
-        "ERROR": 0
-    }
+    # Mapeo zona -> puntaje (nombre a valor numérico)
+    ZONAS = {"CENTRAL": 10, "INTERMEDIA": 9, "EXTERIOR": 8, "ERROR": 0}
 
-    # Radios de las zonas
+    # Parámetros de radios
     RADIO_CENTRAL = 1.0
     RADIO_INTERMEDIA = 3.0
     RADIO_EXTERIOR = 5.0
-    RADIO_ERROR_MULTIPLIER = 1.5
+    RADIO_ERROR_MULTIPLIER = 1.5  # Multiplicador para tiros fuera del blanco
 
-    # Coste de resistencia por tiro
+    # Coste de resistencia
     TIRO_RESISTENCIA_COST = 5
 
-    # Probabilidades base por género (usando nombres de zona)
+    # Probabilidades base
     PROBABILIDADES = {
         "M": {"CENTRAL": 0.20, "INTERMEDIA": 0.33, "EXTERIOR": 0.40, "ERROR": 0.07},
         "F": {"CENTRAL": 0.30, "INTERMEDIA": 0.38, "EXTERIOR": 0.27, "ERROR": 0.05},
     }
 
     def __init__(self):
-        self.tiros: List[Tiro] = []
+        self.players: Dict[str, JugadorTiros] = {}  # JugadorID -> Datos
 
     def realizar_tiro(self, jugador) -> int:
-        """Devuelve solo el puntaje numérico"""
+        """Realiza un tiro y devuelve el puntaje obtenido"""
+        # Verificar resistencia
         if jugador.resistencia_actual < self.TIRO_RESISTENCIA_COST:
-            return self.ZONAS_PUNTAJE["ERROR"]
+            return self.ZONAS["ERROR"]
 
+        # Actualizar estado del jugador
         jugador.resistencia_actual -= self.TIRO_RESISTENCIA_COST
         jugador.tiros_realizados += 1
 
-        # Ajuste dinámico de probabilidades
+        # Calcular probabilidades ajustadas
         probs = self._ajustar_probabilidades(jugador)
-        zona, (x, y) = self._generar_tiro(probs)
+        zona, coordenadas = self._generar_tiro(probs)
+        puntaje = self.ZONAS[zona]
 
-        puntaje = self.ZONAS_PUNTAJE[zona]
-        
-        self.tiros.append(
-            Tiro(
-                jugador_id=jugador.user_id,
-                nombre=jugador.nombre,
-                genero=jugador.genero,
-                zona=zona,
-                puntaje=puntaje,
-                coordenadas=[round(x, 2), round(y, 2)]
-            )
+        # Registrar el tiro
+        if jugador.user_id not in self.players:
+            self._registrar_nuevo_jugador(jugador)
+
+        self.players[jugador.user_id].lanzamientos.append(
+            Lanzamiento(coordenadas=coordenadas, zona=self.ZONAS[zona], puntaje=puntaje)
         )
 
         return puntaje
 
+    def _registrar_nuevo_jugador(self, jugador):
+        """Crea una nueva entrada para un jugador"""
+        self.players[jugador.user_id] = JugadorTiros(
+            jugador_id=jugador.user_id,
+            nombre=jugador.nombre,
+            genero=jugador.genero,
+            lanzamientos=[],
+        )
+
     def _ajustar_probabilidades(self, jugador) -> Dict[str, float]:
-        """Ajusta probabilidades usando experiencia y suerte del jugador"""
+        """Ajusta las probabilidades según habilidades del jugador"""
         probs = self.PROBABILIDADES[jugador.genero].copy()
-        
-        # Aumento para CENTRAL por suerte
-        probs["CENTRAL"] *= (1 + 0.1 * (jugador.suerte / 3))
-        
-        # Reducción para ERROR por experiencia
-        probs["ERROR"] *= (1 - 0.2 * (min(1.0, jugador.experiencia / 50)))
-        
-        # Normalización
+
+        # Aumentar probabilidad de CENTRAL por suerte
+        factor_suerte = jugador.suerte / 3.0  # Normalizar suerte (rango 0-9)
+        probs["CENTRAL"] *= 1 + 0.1 * factor_suerte
+
+        # Reducir probabilidad de ERROR por experiencia
+        factor_experiencia = min(1.0, jugador.experiencia / 50.0)
+        probs["ERROR"] *= 1 - 0.2 * factor_experiencia
+
+        # Normalizar probabilidades
         total = sum(probs.values())
         return {zona: prob / total for zona, prob in probs.items()}
 
     def _generar_tiro(self, probs: Dict[str, float]) -> tuple:
-        """Genera coordenadas usando solo random estándar"""
-        # Selección de zona
+        """Genera coordenadas del tiro usando random estándar"""
+        # Seleccionar zona
         zona = random.choices(
-            population=list(probs.keys()),
-            weights=list(probs.values()),
-            k=1
+            population=list(probs.keys()), weights=list(probs.values()), k=1
         )[0]
 
-        # Cálculo de radio según zona
+        # Calcular radio según zona
         if zona == "ERROR":
-            radio = random.uniform(self.RADIO_EXTERIOR, self.RADIO_EXTERIOR * self.RADIO_ERROR_MULTIPLIER)
+            radio = random.uniform(
+                self.RADIO_EXTERIOR, self.RADIO_EXTERIOR * self.RADIO_ERROR_MULTIPLIER
+            )
         elif zona == "EXTERIOR":
             radio = random.uniform(self.RADIO_INTERMEDIA, self.RADIO_EXTERIOR)
         elif zona == "INTERMEDIA":
             radio = random.uniform(self.RADIO_CENTRAL, self.RADIO_INTERMEDIA)
-        else:
+        else:  # CENTRAL
             radio = random.uniform(0, self.RADIO_CENTRAL)
 
-        # Coordenadas polares
+        # Generar coordenadas polares
         angulo = random.uniform(0, 2 * math.pi)
-        x = radio * math.cos(angulo)
-        y = radio * math.sin(angulo)
+        x = round(radio * math.cos(angulo), 2)
+        y = round(radio * math.sin(angulo), 2)
 
-        return zona, (x, y)
+        return zona, [x, y]
 
     def obtener_tiros_serializables(self) -> List[dict]:
-        return [asdict(tiro) for tiro in self.tiros]
+        """Devuelve los datos en formato JSON optimizado"""
+        return [asdict(player) for player in self.players.values()]
 
     def reset(self):
-        self.tiros = []
+        """Reinicia todos los registros"""
+        self.players.clear()

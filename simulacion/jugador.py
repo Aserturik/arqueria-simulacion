@@ -14,11 +14,15 @@ class Jugador:
         self.tiros_realizados = 0
 
         # Relaciones requeridas por la lógica de Ronda
-        self.resistencia_actual = self.resistencia          # Valor actual de resistencia
-        self.resistencia_previa = self.resistencia          # Para almacenar la resistencia antes del turno
-        self.consecutivo_extra_ganados = 0                  # Conteo de tiros extra consecutivos ganados
-        self.punteria = random.randint(50, 100)             # Valor de puntería para desempates
-        self.beneficio_resistencia = False                  # Beneficio que puede mejorar la recuperación
+        self.resistencia_actual = self.resistencia  # Valor actual de resistencia
+        self.resistencia_previa = (
+            self.resistencia
+        )  # Para almacenar la resistencia antes del turno
+        self.consecutivo_extra_ganados = 0  # Conteo de tiros extra consecutivos ganados
+        self.punteria = random.randint(50, 100)  # Valor de puntería para desempates
+        self.beneficio_resistencia = (
+            False  # Beneficio que puede mejorar la recuperación
+        )
 
     def _generar_habilidades(self):
         # Generamos y guardamos los valores iniciales
@@ -47,6 +51,12 @@ class Jugador:
         """Al final del juego, recupera su resistencia original"""
         self.reiniciar_habilidades()
         self.cansancio_acumulado = 0
+
+    def puede_tirar(self):
+        """Verifica si el jugador tiene suficiente resistencia para realizar un tiro"""
+        return (
+            self.resistencia_actual >= 5
+        )  # Mismo valor que Blanco.TIRO_RESISTENCIA_COST
 
     def finalizar_ronda(self):
         """
