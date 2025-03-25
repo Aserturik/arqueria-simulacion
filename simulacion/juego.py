@@ -1,11 +1,12 @@
+import uuid
+import matplotlib.pyplot as plt
 from .equipo import Equipo
 from .blanco_objetivo import Blanco
-import matplotlib.pyplot as plt
-import uuid
+from .ronda import Ronda
 
 
 class Juego:
-    def __init__(self, nombre_equipo1, nombre_equipo2, num_jugadores=5, num_rondas=3):
+    def __init__(self, nombre_equipo1, nombre_equipo2, num_jugadores=5, num_rondas=10):
         self.id_juego = str(uuid.uuid4())
         self.equipo1 = Equipo(nombre_equipo1, "M", num_jugadores)
         self.equipo2 = Equipo(nombre_equipo2, "F", num_jugadores)
@@ -15,130 +16,65 @@ class Juego:
         self.historial_puntajes = []
 
     def jugar_ronda(self):
-        """Simula una ronda completa del juego"""
         self.ronda_actual += 1
-        print(f"\n--- RONDA {self.ronda_actual} ---")
-
-        # Resultados de la ronda
-        resultado_ronda = {
-            "ronda": self.ronda_actual,
-            "equipo1": {"puntaje": 0, "tiros": 0},
-            "equipo2": {"puntaje": 0, "tiros": 0},
-        }
-
-        # Equipo 1 juega
-        print(f"\nEquipo {self.equipo1.nombre} (Masculino):")
-        for i, jugador in enumerate(self.equipo1.jugadores):
-            puntaje_jugador = 0
-            tiros_realizados = 0
-
-            print(f"  {jugador.nombre} - ", end="")
-            while jugador.resistencia >= 5:
-                puntaje = self.blanco.realizar_tiro(jugador)
-                puntaje_jugador += puntaje
-                tiros_realizados += 1
-
-            print(f"Puntaje: {puntaje_jugador} ({tiros_realizados} tiros)")
-            jugador.puntaje_total += puntaje_jugador
-            resultado_ronda["equipo1"]["puntaje"] += puntaje_jugador
-            resultado_ronda["equipo1"]["tiros"] += tiros_realizados
-            jugador.finalizar_ronda()
-
-        # Equipo 2 juega
-        print(f"\nEquipo {self.equipo2.nombre} (Femenino):")
-        for i, jugador in enumerate(self.equipo2.jugadores):
-            puntaje_jugador = 0
-            tiros_realizados = 0
-
-            print(f"  {jugador.nombre} - ", end="")
-            while jugador.resistencia >= 5:
-                puntaje = self.blanco.realizar_tiro(jugador)
-                puntaje_jugador += puntaje
-                tiros_realizados += 1
-
-            print(f"Puntaje: {puntaje_jugador} ({tiros_realizados} tiros)")
-            jugador.puntaje_total += puntaje_jugador
-            resultado_ronda["equipo2"]["puntaje"] += puntaje_jugador
-            resultado_ronda["equipo2"]["tiros"] += tiros_realizados
-            jugador.finalizar_ronda()
-
-        # Determinar ganador de la ronda
-        if (
-            resultado_ronda["equipo1"]["puntaje"]
-            > resultado_ronda["equipo2"]["puntaje"]
-        ):
-            ganador = self.equipo1.nombre
-            self.equipo1.rondas_ganadas += 1
-        elif (
-            resultado_ronda["equipo2"]["puntaje"]
-            > resultado_ronda["equipo1"]["puntaje"]
-        ):
-            ganador = self.equipo2.nombre
-            self.equipo2.rondas_ganadas += 1
-        else:
-            ganador = "Empate"
-
-        resultado_ronda["ganador"] = ganador
-        self.historial_puntajes.append(resultado_ronda)
-
-        print(f"\nResultado Ronda {self.ronda_actual}:")
-        print(
-            f"  {self.equipo1.nombre}: {resultado_ronda['equipo1']['puntaje']} puntos"
-        )
-        print(
-            f"  {self.equipo2.nombre}: {resultado_ronda['equipo2']['puntaje']} puntos"
-        )
-        print(f"  Ganador: {ganador}")
-
-        return resultado_ronda
+        ronda = Ronda(self.ronda_actual, self.equipo1, self.equipo2, self.blanco)
+        resultado = ronda.jugar()
+        self.historial_puntajes.append(resultado)
+        self._mostrar_resultados_ronda(resultado)
+        return resultado
 
     def jugar_partida_completa(self):
-        """Juega una partida completa con todas las rondas"""
-        print(f"¡COMIENZA EL JUEGO DE ARQUERÍA!")
+        print("¡COMIENZA EL JUEGO DE ARQUERÍA!")
         print(f"Equipo 1: {self.equipo1.nombre} (M)")
         print(f"Equipo 2: {self.equipo2.nombre} (F)")
-        print(f"Rondas: {self.num_rondas}")
 
         for _ in range(self.num_rondas):
             self.jugar_ronda()
 
-        # Determinar ganador final
-        if self.equipo1.rondas_ganadas > self.equipo2.rondas_ganadas:
-            ganador_final = self.equipo1.nombre
-            self.equipo1.juegos_ganados += 1
-        elif self.equipo2.rondas_ganadas > self.equipo1.rondas_ganadas:
-            ganador_final = self.equipo2.nombre
-            self.equipo2.juegos_ganados += 1
-        else:
-            ganador_final = "Empate"
+        self._finalizar_juego()
 
-        print("\n--- RESULTADO FINAL ---")
-        print(f"  {self.equipo1.nombre}: {self.equipo1.rondas_ganadas} rondas ganadas")
-        print(f"  {self.equipo2.nombre}: {self.equipo2.rondas_ganadas} rondas ganadas")
-        print(f"  ¡{ganador_final} gana el juego!")
+    def _mostrar_resultados_ronda(self, resultado):
+        print(f"\n--- RESULTADOS RONDA {self.ronda_actual} ---")
+        print(f"{self.equipo1.nombre}: {resultado['equipo1']['puntaje']} puntos")
+        print(f"{self.equipo2.nombre}: {resultado['equipo2']['puntaje']} puntos")
+        print(f"Ganador: {resultado['ganador_individual']}")
 
-        # Visualizar el resultado
+    def _finalizar_juego(self):
+        self._determinar_ganador_final()
         self.visualizar_resultados()
+        self._reiniciar_jugadores()
 
-        # Reiniciar jugadores para próximo juego
+    def _determinar_ganador_final(self):
+        print("\n--- RESULTADO FINAL ---")
+        print(f"{self.equipo1.nombre}: {self.equipo1.rondas_ganadas} rondas")
+        print(f"{self.equipo2.nombre}: {self.equipo2.rondas_ganadas} rondas")
+
+        if self.equipo1.rondas_ganadas > self.equipo2.rondas_ganadas:
+            print(f"¡{self.equipo1.nombre} gana el juego!")
+        elif self.equipo2.rondas_ganadas > self.equipo1.rondas_ganadas:
+            print(f"¡{self.equipo2.nombre} gana el juego!")
+        else:
+            print("¡Empate!")
+
+    def _reiniciar_jugadores(self):
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
-            jugador.finalizar_juego()
+            jugador.resistencia_actual = jugador.resistencia_inicial
+            jugador.consecutivo_extra_ganados = 0
 
     def visualizar_resultados(self):
-        """Muestra gráficos con los resultados del juego"""
-        # Visualizar el blanco con todos los tiros
         self.blanco.visualizar_tiros()
+        self._graficar_evolucion_puntajes()
 
-        # Gráfico de puntajes por ronda
+    def _graficar_evolucion_puntajes(self):
         rondas = [r["ronda"] for r in self.historial_puntajes]
-        puntajes_eq1 = [r["equipo1"]["puntaje"] for r in self.historial_puntajes]
-        puntajes_eq2 = [r["equipo2"]["puntaje"] for r in self.historial_puntajes]
+        puntajes1 = [r["equipo1"]["puntaje"] for r in self.historial_puntajes]
+        puntajes2 = [r["equipo2"]["puntaje"] for r in self.historial_puntajes]
 
         plt.figure(figsize=(10, 6))
-        plt.plot(rondas, puntajes_eq1, "o-", label=self.equipo1.nombre)
-        plt.plot(rondas, puntajes_eq2, "o-", label=self.equipo2.nombre)
+        plt.plot(rondas, puntajes1, "o-", label=self.equipo1.nombre)
+        plt.plot(rondas, puntajes2, "o-", label=self.equipo2.nombre)
         plt.xlabel("Ronda")
-        plt.ylabel("Puntaje")
+        plt.ylabel("Puntos")
         plt.title("Evolución de puntajes por ronda")
         plt.legend()
         plt.grid(True)

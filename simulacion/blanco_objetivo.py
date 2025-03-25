@@ -39,24 +39,21 @@ class Blanco:
         """
         Realiza un tiro simulado basado en las habilidades del jugador y las probabilidades por género
         """
-        # Verificar si el jugador puede realizar el tiro
-        if jugador.resistencia < 5:
+        # Verificar si el jugador puede realizar el tiro usando resistencia_actual
+        if jugador.resistencia_actual < 5:
             return 0
 
-        # Reducir resistencia y contabilizar tiro
-        jugador.resistencia -= 5
+        # Reducir resistencia_actual y contabilizar tiro
+        jugador.resistencia_actual -= 5
         jugador.tiros_realizados += 1
 
         # Obtenemos probabilidades según género
         probs = self.PROBABILIDADES[jugador.genero]
 
         # Ajustamos probabilidades según habilidades del jugador
-        # La experiencia mejora la precisión (reduce probabilidad de error)
         factor_experiencia = min(1.0, jugador.experiencia / 50)
-        # La suerte puede ayudar a dar en zonas de mayor puntaje
         factor_suerte = jugador.suerte / 3.0
 
-        # Ajustamos probabilidades
         probs_ajustadas = {
             self.CENTRAL: probs[self.CENTRAL] * (1 + 0.1 * factor_suerte),
             self.INTERMEDIA: probs[self.INTERMEDIA],
@@ -64,18 +61,14 @@ class Blanco:
             self.ERROR: probs[self.ERROR] * (1 - 0.2 * factor_experiencia),
         }
 
-        # Normalizamos para que sumen 1
         total = sum(probs_ajustadas.values())
         probs_ajustadas = {k: v / total for k, v in probs_ajustadas.items()}
 
-        # Simulamos el tiro usando distribución de probabilidad
         zonas = [self.CENTRAL, self.INTERMEDIA, self.EXTERIOR, self.ERROR]
         probabilidades = [probs_ajustadas[zona] for zona in zonas]
         zona_impacto = np.random.choice(zonas, p=probabilidades)
 
-        # Generamos coordenadas para representar gráficamente
         if zona_impacto == self.ERROR:
-            # Fuera del blanco (radio > RADIO_EXTERIOR)
             angulo = random.uniform(0, 2 * np.pi)
             radio = random.uniform(self.RADIO_EXTERIOR, self.RADIO_EXTERIOR * 1.5)
         elif zona_impacto == self.EXTERIOR:
@@ -91,7 +84,6 @@ class Blanco:
         x = radio * np.cos(angulo)
         y = radio * np.sin(angulo)
 
-        # Guardamos el tiro
         tiro = {
             "jugador_id": jugador.user_id,
             "nombre": jugador.nombre,
