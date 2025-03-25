@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultados del Juego</title>
+</head>
+<body>
+    <h1>Resultados del Juego</h1>
+    <p>{{ resultado_final }}</p>
+    <h2>Evolución de puntajes por ronda</h2>
+    <img src="data:image/png;base64,{{ imagen }}" alt="Gráfica de puntajes">
+    <br>
+    <a href="{{ url_for('index') }}">Volver</a>
+</body>
+</html>

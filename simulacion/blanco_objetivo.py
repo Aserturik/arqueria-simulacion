@@ -125,7 +125,7 @@ class Blanco:
 
         plt.title("Simulación de Tiros en Diana")
         plt.grid(True)
-        plt.show()
+#        plt.show()
 
     def reset(self):
         """Reinicia el historial de tiros"""

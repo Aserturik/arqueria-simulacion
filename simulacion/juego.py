@@ -62,7 +62,6 @@ class Juego:
             jugador.consecutivo_extra_ganados = 0
 
     def visualizar_resultados(self):
-        self.blanco.visualizar_tiros()
         self._graficar_evolucion_puntajes()
 
     def _graficar_evolucion_puntajes(self):
@@ -78,4 +77,28 @@ class Juego:
         plt.title("Evolución de puntajes por ronda")
         plt.legend()
         plt.grid(True)
-        plt.show()
+        #plt.show()
+
+    def generar_imagen_resultados(self):
+        import io
+        import base64
+
+        rondas = [r["ronda"] for r in self.historial_puntajes]
+        puntajes1 = [r["equipo1"]["puntaje"] for r in self.historial_puntajes]
+        puntajes2 = [r["equipo2"]["puntaje"] for r in self.historial_puntajes]
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(rondas, puntajes1, "o-", label=self.equipo1.nombre)
+        plt.plot(rondas, puntajes2, "o-", label=self.equipo2.nombre)
+        plt.xlabel("Ronda")
+        plt.ylabel("Puntos")
+        plt.title("Evolución de puntajes por ronda")
+        plt.legend()
+        plt.grid(True)
+
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png")
+        buf.seek(0)
+        image_base64 = base64.b64encode(buf.read()).decode("utf-8")
+        plt.close()
+        return image_base64
