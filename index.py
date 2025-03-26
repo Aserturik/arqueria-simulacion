@@ -28,21 +28,11 @@ def index():
 @app.route("/jugar", methods=["POST"])
 def jugar():
     juego = Juego(
-        "Arqueros del Norte", "Arqueras del Sur", num_jugadores=5, num_rondas=10
+        "Arqueros del Norte", "Arqueras del Sur", num_jugadores=5, num_rondas=200000
     )
 
     # Al iniciar la simulación se crea o resetea el JSON
     inicial_data = {
-        "equipo1": {
-            "nombre": juego.equipo1.nombre,
-            "rondas_ganadas": juego.equipo1.rondas_ganadas,  # normalmente 0
-            "puntaje_total": juego.equipo1.puntaje_total,  # valor inicial
-        },
-        "equipo2": {
-            "nombre": juego.equipo2.nombre,
-            "rondas_ganadas": juego.equipo2.rondas_ganadas,
-            "puntaje_total": juego.equipo2.puntaje_total,
-        },
         "simulacion": {},  # Aquí se guardará el juego actual
     }
     with open(JSON_FILE, "w") as f:
@@ -52,25 +42,26 @@ def jugar():
     juego.jugar_partida_completa()
 
     # Preparar los datos de la simulación
+    # Se recopilan los datos de la simulación para ser almacenados
     simulacion_data = {
-        "id_juego": juego.id_juego,
-        "historial_puntajes": juego.historial_puntajes,
         "equipo1": {
-            "nombre": juego.equipo1.nombre,
-            "rondas_ganadas": juego.equipo1.rondas_ganadas,
-            "puntaje_total": juego.equipo1.puntaje_total,
+            "nombre": juego.equipo1.nombre,  # Nombre del primer equipo
+            "rondas_ganadas": juego.equipo1.rondas_ganadas,  # Rondas ganadas por el primer equipo
+            "puntaje_total": juego.equipo1.puntaje_total,  # Puntaje total del primer equipo
         },
         "equipo2": {
-            "nombre": juego.equipo2.nombre,
-            "rondas_ganadas": juego.equipo2.rondas_ganadas,
-            "puntaje_total": juego.equipo2.puntaje_total,
+            "nombre": juego.equipo2.nombre,  # Nombre del segundo equipo
+            "rondas_ganadas": juego.equipo2.rondas_ganadas,  # Rondas ganadas por el segundo equipo
+            "puntaje_total": juego.equipo2.puntaje_total,  # Puntaje total del segundo equipo
         },
-        "blanco": {
-            "tiros": juego.blanco.obtener_tiros_serializables(),
-            "RADIO_CENTRAL": juego.blanco.RADIO_CENTRAL,
-            "RADIO_INTERMEDIA": juego.blanco.RADIO_INTERMEDIA,
-            "RADIO_EXTERIOR": juego.blanco.RADIO_EXTERIOR,
-        },
+        "id_juego": juego.id_juego,  # Identificador único del juego
+        "historial_puntajes": juego.historial_puntajes,  # Historial de puntajes por ronda
+        # "blanco": {
+        #  "tiros": juego.blanco.obtener_tiros_serializables(),  # Tiros realizados en el blanco
+        #  "RADIO_CENTRAL": juego.blanco.RADIO_CENTRAL,  # Radio central del blanco
+        #  "RADIO_INTERMEDIA": juego.blanco.RADIO_INTERMEDIA,  # Radio intermedio del blanco
+        #  "RADIO_EXTERIOR": juego.blanco.RADIO_EXTERIOR,  # Radio exterior del blanco
+        # },
     }
     simulacion_data = convert_numpy(simulacion_data)
 

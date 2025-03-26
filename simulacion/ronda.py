@@ -10,8 +10,18 @@ class Ronda:
         self.blanco = blanco
         self.resultado = {
             "ronda": numero_ronda,
-            "equipo1": {"puntaje": 0, "tiros": 0, "puntaje_grupo": 0},
-            "equipo2": {"puntaje": 0, "tiros": 0, "puntaje_grupo": 0},
+            "equipo1": {
+                "puntaje": 0,
+                "tiros": 0,
+                "puntaje_grupo": 0,
+                "tiros_jugadores": {},
+            },
+            "equipo2": {
+                "puntaje": 0,
+                "tiros": 0,
+                "puntaje_grupo": 0,
+                "tiros_jugadores": {},
+            },
             "ganador_individual": None,
             "ganador_grupal": None,
         }
@@ -24,6 +34,7 @@ class Ronda:
         self._determinar_ganador_individual()
         self._actualizar_experiencia()
         self._recuperar_resistencia()
+        self._registrar_tiros_jugadores()
         return self.resultado
 
     def _preparar_jugadores(self):
@@ -51,6 +62,26 @@ class Ronda:
             tiro = self.blanco.realizar_tiro(jugador)
             self.resultado[clave]["puntaje_grupo"] += tiro
             equipo.puntaje_total += tiro
+
+    def _registrar_tiros_jugadores(self):
+        """
+        Registra los tiros de cada jugador en el resultado, asociándolos al equipo correspondiente.
+        Utiliza el método obtener_tiros_serializables del blanco para obtener datos detallados.
+        """
+        tiros_serializados = self.blanco.obtener_tiros_serializables()
+
+        # Creamos conjuntos con los IDs de los jugadores de cada equipo para búsqueda eficiente
+        ids_equipo1 = {jugador.user_id for jugador in self.equipo1.jugadores}
+        ids_equipo2 = {jugador.user_id for jugador in self.equipo2.jugadores}
+
+        # Asignamos los tiros al equipo correspondiente
+        for jugador_tiros in tiros_serializados:
+            jugador_id = jugador_tiros["jugador_id"]
+
+            if jugador_id in ids_equipo1:
+                self.resultado["equipo1"]["tiros_jugadores"][jugador_id] = jugador_tiros
+            elif jugador_id in ids_equipo2:
+                self.resultado["equipo2"]["tiros_jugadores"][jugador_id] = jugador_tiros
 
     def _manejar_lanzamientos_extra_consecutivos(self):
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
