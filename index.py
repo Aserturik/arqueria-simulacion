@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, session, request
 from simulacion.juego import Juego
+from simulacion.equipo import Equipo
 import numpy as np
 import json
 
@@ -27,10 +28,10 @@ def index():
 
 @app.route("/jugar", methods=["POST"])
 def jugar():
-    juego = Juego(
-        "Arqueros del Norte", "Arqueras del Sur", num_jugadores=5, num_rondas=200000
-    )
+    equipo_1 = Equipo("Arqueros del norte", "M", 5)
+    equipo_2 = Equipo("Arqueras del sur", "F", 5)
 
+    juego = Juego(equipo_1, equipo_2, num_rondas=2, num_juegos=2)
     # Al iniciar la simulación se crea o resetea el JSON
     inicial_data = {
         "simulacion": {},  # Aquí se guardará el juego actual

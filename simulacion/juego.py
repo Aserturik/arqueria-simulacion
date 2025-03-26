@@ -1,23 +1,20 @@
 import uuid
-import matplotlib.pyplot as plt
 from .equipo import Equipo
 from .blanco_objetivo import Blanco
 from .ronda import Ronda
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 
 
 class Juego:
-    def __init__(self, nombre_equipo1, nombre_equipo2, num_jugadores=5, num_rondas=10):
+    def __init__(self, equipo1, equipo2, num_rondas=10, num_juegos=10):
         self.id_juego = str(uuid.uuid4())
-        self.equipo1 = Equipo(nombre_equipo1, "M", num_jugadores)
-        self.equipo2 = Equipo(nombre_equipo2, "F", num_jugadores)
+        self.equipo1 = equipo1
+        self.equipo2 = equipo2
         self.blanco = Blanco()
         self.num_rondas = num_rondas
         self.ronda_actual = 0
+        self.num_juegos = num_juegos
         self.historial_puntajes = []
+        self.juego_actual = 0
 
     def jugar_ronda(self):
         self.ronda_actual += 1
@@ -28,14 +25,16 @@ class Juego:
         return resultado
 
     def jugar_partida_completa(self):
-        print("¡COMIENZA EL JUEGO DE ARQUERÍA!")
-        print(f"Equipo 1: {self.equipo1.nombre} (M)")
-        print(f"Equipo 2: {self.equipo2.nombre} (F)")
-
-        for _ in range(self.num_rondas):
-            self.jugar_ronda()
+        for _ in range(self.num_juegos):
+            self._jugar_juego()
 
         self._finalizar_juego()
+
+    def _jugar_juego(self):
+        self.juego_actual += 1
+        for _ in range(self.num_rondas):
+            self.jugar_ronda()
+            self._reiniciar_jugadores()
 
     def _mostrar_resultados_ronda(self, resultado):
         print(f"\n--- RESULTADOS RONDA {self.ronda_actual} ---")
@@ -63,4 +62,3 @@ class Juego:
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
             jugador.resistencia_actual = jugador.resistencia_inicial
             jugador.consecutivo_extra_ganados = 0
-    

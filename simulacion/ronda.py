@@ -1,5 +1,4 @@
 import random
-from .blanco_objetivo import Blanco
 
 
 class Ronda:
@@ -11,12 +10,14 @@ class Ronda:
         self.resultado = {
             "ronda": numero_ronda,
             "equipo1": {
+                "nombre": equipo1.nombre,
                 "puntaje": 0,
                 "tiros": 0,
                 "puntaje_grupo": 0,
                 "tiros_jugadores": {},
             },
             "equipo2": {
+                "nombre": equipo2.nombre,
                 "puntaje": 0,
                 "tiros": 0,
                 "puntaje_grupo": 0,
