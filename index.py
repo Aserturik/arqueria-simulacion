@@ -31,66 +31,72 @@ def jugar():
     equipo_1 = Equipo("Arqueros del norte", "M", 5)
     equipo_2 = Equipo("Arqueras del sur", "F", 5)
 
-    resultados_juegos = []  # Lista para almacenar los resultados de los 10 juegos
+    # Para resultados acumulados, creamos o limpiamos el archivo al inicio
+    with open("resultados_acumulados.json", "w") as f:
+        f.write("[\n")  # Iniciamos el array JSON
 
-    for i in range(20000):  # Iterar 10 veces para simular 10 juegos
-        juego = Juego(equipo_1, equipo_2, num_rondas=1, juego_actual=i + 1)
+    total_juegos = 50
+    # Guarda solo el último juego para mostrar en la interfaz
+    ultimo_juego = None
+
+    for i in range(total_juegos):
+        # Crear y jugar el juego
+        juego = Juego(equipo_1, equipo_2, num_rondas=5, juego_actual=i + 1)
         juego.jugar_partida_completa()
+        print(f"\n--- JUEGO {i + 1} ---")
 
-        # Guardar los resultados de cada juego
-        resultado_juego = {
+        # Guardar los resultados básicos (sin incluir todo el historial de rondas)
+        resultado_basico = {
             "id_juego": juego.id_juego,
             "numero_juego": juego.juego_actual,
-            "equipo 1": {
+            "equipo_1": {
                 "nombre": juego.equipo1.nombre,
                 "rondas_ganadas": juego.equipo1.rondas_ganadas,
                 "puntaje_total": juego.equipo1.puntaje_total,
             },
-            "equipo 2": {
+            "equipo_2": {
                 "nombre": juego.equipo2.nombre,
                 "rondas_ganadas": juego.equipo2.rondas_ganadas,
                 "puntaje_total": juego.equipo2.puntaje_total,
             },
-            "historial_rondas": juego.historial_rondas,
         }
-        resultados_juegos.append(convert_numpy(resultado_juego))
 
-        # Guardar los resultados acumulados en un archivo JSON
-        with open("resultados_acumulados.json", "w") as f:
-            json.dump(resultados_juegos, f, indent=4)
+        # Guardar solo el último juego completo para la interfaz
+        if i == total_juegos - 1:
+            ultimo_juego = {
+                "equipo1": {
+                    "nombre": juego.equipo1.nombre,
+                    "rondas_ganadas": juego.equipo1.rondas_ganadas,
+                    "puntaje_total": juego.equipo1.puntaje_total,
+                },
+                "equipo2": {
+                    "nombre": juego.equipo2.nombre,
+                    "rondas_ganadas": juego.equipo2.rondas_ganadas,
+                    "puntaje_total": juego.equipo2.puntaje_total,
+                },
+                "id_juego": juego.id_juego,
+                "historial_rondas": juego.historial_rondas,
+            }
 
-    # Se ejecuta la simulación (en este ejemplo se asume que el método juega la partida completa y actualiza los datos)
-    juego.jugar_partida_completa()
+        # Escribir cada resultado individual al archivo con coma solo si no es el último
+        with open("resultados_acumulados.json", "a") as f:
+            f.write(json.dumps(convert_numpy(resultado_basico), indent=2))
+            if i < total_juegos - 1:
+                f.write(",\n")
+            else:
+                f.write("\n]")  # Cerramos el array JSON al final
 
-    # Preparar los datos de la simulación
-    simulacion_data = {
-        "equipo1": {
-            "nombre": juego.equipo1.nombre,
-            "rondas_ganadas": juego.equipo1.rondas_ganadas,
-            "puntaje_total": juego.equipo1.puntaje_total,
-        },
-        "equipo2": {
-            "nombre": juego.equipo2.nombre,
-            "rondas_ganadas": juego.equipo2.rondas_ganadas,
-            "puntaje_total": juego.equipo2.puntaje_total,
-        },
-        "id_juego": juego.id_juego,
-        "historial_rondas": juego.historial_rondas,
-    }
-    simulacion_data = convert_numpy(simulacion_data)
-
-    session["game_id"] = (
-        juego.id_juego
-    )  # Opcional, para usar en otra ruta si se requiere
+    session["game_id"] = juego.id_juego
 
     resultado_final = (
         f"{juego.equipo1.nombre}: {juego.equipo1.rondas_ganadas} rondas vs "
         f"{juego.equipo2.nombre}: {juego.equipo2.rondas_ganadas} rondas."
     )
+
     return render_template(
         "resultados.html",
         resultado_final=resultado_final,
-        simulacion_data=simulacion_data,
+        simulacion_data=convert_numpy(ultimo_juego),
     )
 
 
