@@ -31,47 +31,53 @@ def jugar():
     equipo_1 = Equipo("Arqueros del norte", "M", 5)
     equipo_2 = Equipo("Arqueras del sur", "F", 5)
 
-    juego = Juego(equipo_1, equipo_2, num_rondas=2, num_juegos=2)
-    # Al iniciar la simulación se crea o resetea el JSON
-    inicial_data = {
-        "simulacion": {},  # Aquí se guardará el juego actual
-    }
-    with open(JSON_FILE, "w") as f:
-        json.dump(inicial_data, f)
+    resultados_juegos = []  # Lista para almacenar los resultados de los 10 juegos
+
+    for i in range(1):  # Iterar 10 veces para simular 10 juegos
+        juego = Juego(equipo_1, equipo_2, num_rondas=1, juego_actual=i+1)
+        juego.jugar_partida_completa()
+
+        # Guardar los resultados de cada juego
+        resultado_juego = {
+            "id_juego": juego.id_juego,
+            "numero_juego": juego.juego_actual, 
+            "equipo1": {
+                "nombre": juego.equipo1.nombre,
+                "rondas_ganadas": juego.equipo1.rondas_ganadas,
+                "puntaje_total": juego.equipo1.puntaje_total,
+            },
+            "equipo2": {
+                "nombre": juego.equipo2.nombre,
+                "rondas_ganadas": juego.equipo2.rondas_ganadas,
+                "puntaje_total": juego.equipo2.puntaje_total,
+            },
+            "historial_rondas": juego.historial_rondas,
+        }
+        resultados_juegos.append(convert_numpy(resultado_juego))
+
+        # Guardar los resultados acumulados en un archivo JSON
+        with open("resultados_acumulados.json", "w") as f:
+            json.dump(resultados_juegos, f, indent=4)
 
     # Se ejecuta la simulación (en este ejemplo se asume que el método juega la partida completa y actualiza los datos)
     juego.jugar_partida_completa()
 
     # Preparar los datos de la simulación
-    # Se recopilan los datos de la simulación para ser almacenados
     simulacion_data = {
         "equipo1": {
-            "nombre": juego.equipo1.nombre,  # Nombre del primer equipo
-            "rondas_ganadas": juego.equipo1.rondas_ganadas,  # Rondas ganadas por el primer equipo
-            "puntaje_total": juego.equipo1.puntaje_total,  # Puntaje total del primer equipo
+            "nombre": juego.equipo1.nombre,
+            "rondas_ganadas": juego.equipo1.rondas_ganadas,
+            "puntaje_total": juego.equipo1.puntaje_total,
         },
         "equipo2": {
-            "nombre": juego.equipo2.nombre,  # Nombre del segundo equipo
-            "rondas_ganadas": juego.equipo2.rondas_ganadas,  # Rondas ganadas por el segundo equipo
-            "puntaje_total": juego.equipo2.puntaje_total,  # Puntaje total del segundo equipo
+            "nombre": juego.equipo2.nombre,
+            "rondas_ganadas": juego.equipo2.rondas_ganadas,
+            "puntaje_total": juego.equipo2.puntaje_total,
         },
-        "id_juego": juego.id_juego,  # Identificador único del juego
-        "historial_puntajes": juego.historial_puntajes,  # Historial de puntajes por ronda
-        # "blanco": {
-        #  "tiros": juego.blanco.obtener_tiros_serializables(),  # Tiros realizados en el blanco
-        #  "RADIO_CENTRAL": juego.blanco.RADIO_CENTRAL,  # Radio central del blanco
-        #  "RADIO_INTERMEDIA": juego.blanco.RADIO_INTERMEDIA,  # Radio intermedio del blanco
-        #  "RADIO_EXTERIOR": juego.blanco.RADIO_EXTERIOR,  # Radio exterior del blanco
-        # },
+        "id_juego": juego.id_juego,
+        "historial_rondas": juego.historial_rondas,
     }
     simulacion_data = convert_numpy(simulacion_data)
-
-    # Se actualiza el JSON con los datos del juego actual (sobreescribiendo lo previo)
-    with open(JSON_FILE, "r") as f:
-        data = json.load(f)
-    data["simulacion"] = simulacion_data
-    with open(JSON_FILE, "w") as f:
-        json.dump(data, f)
 
     session["game_id"] = (
         juego.id_juego
@@ -86,7 +92,6 @@ def jugar():
         resultado_final=resultado_final,
         simulacion_data=simulacion_data,
     )
-
 
 @app.route("/graficas", methods=["GET"])
 def graficas():

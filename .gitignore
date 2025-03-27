@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 simulacion_data.json
+resultados_acumulados.json
+resultados_juegos.json
 
 # C extensions
 *.so

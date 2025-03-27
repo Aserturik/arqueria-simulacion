@@ -1,40 +1,32 @@
 import uuid
-from .equipo import Equipo
 from .blanco_objetivo import Blanco
 from .ronda import Ronda
 
 
 class Juego:
-    def __init__(self, equipo1, equipo2, num_rondas=10, num_juegos=10):
+    def __init__(self, equipo1, equipo2, num_rondas=10, juego_actual=0):
         self.id_juego = str(uuid.uuid4())
         self.equipo1 = equipo1
         self.equipo2 = equipo2
         self.blanco = Blanco()
         self.num_rondas = num_rondas
         self.ronda_actual = 0
-        self.num_juegos = num_juegos
-        self.historial_puntajes = []
-        self.juego_actual = 0
+        self.historial_rondas = []
+        self.juego_actual = juego_actual
 
     def jugar_ronda(self):
         self.ronda_actual += 1
         ronda = Ronda(self.ronda_actual, self.equipo1, self.equipo2, self.blanco)
         resultado = ronda.jugar()
-        self.historial_puntajes.append(resultado)
+        self.historial_rondas.append(resultado)
         self._mostrar_resultados_ronda(resultado)
         return resultado
 
     def jugar_partida_completa(self):
-        for _ in range(self.num_juegos):
-            self._jugar_juego()
-
-        self._finalizar_juego()
-
-    def _jugar_juego(self):
-        self.juego_actual += 1
         for _ in range(self.num_rondas):
             self.jugar_ronda()
-            self._reiniciar_jugadores()
+
+        self._finalizar_ronda()
 
     def _mostrar_resultados_ronda(self, resultado):
         print(f"\n--- RESULTADOS RONDA {self.ronda_actual} ---")
@@ -42,7 +34,7 @@ class Juego:
         print(f"{self.equipo2.nombre}: {resultado['equipo2']['puntaje']} puntos")
         print(f"Ganador: {resultado['ganador_individual']}")
 
-    def _finalizar_juego(self):
+    def _finalizar_ronda(self):
         self._determinar_ganador_final()
         self._reiniciar_jugadores()
 
