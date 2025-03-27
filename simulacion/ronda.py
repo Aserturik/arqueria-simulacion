@@ -8,15 +8,15 @@ class Ronda:
         self.equipo2 = equipo2
         self.blanco = blanco
         self.resultado = {
-            "ronda": numero_ronda,
-            "equipo1": {
+            "ronda actual": numero_ronda,
+            "equipo 1": {
                 "nombre": equipo1.nombre,
                 "puntaje": 0,
                 "tiros": 0,
                 "puntaje_grupo": 0,
                 "tiros_jugadores": {},
             },
-            "equipo2": {
+            "equipo 2": {
                 "nombre": equipo2.nombre,
                 "puntaje": 0,
                 "tiros": 0,
@@ -25,6 +25,7 @@ class Ronda:
             },
             "ganador_individual": None,
             "ganador_grupal": None,
+            "ronda": numero_ronda,
         }
 
     def jugar(self):
@@ -44,8 +45,8 @@ class Ronda:
             jugador.resistencia_actual = jugador.resistencia_previa
 
     def _jugar_turnos_equipos(self):
-        self._jugar_turno_equipo(self.equipo1, "equipo1")
-        self._jugar_turno_equipo(self.equipo2, "equipo2")
+        self._jugar_turno_equipo(self.equipo1, "equipo 1")
+        self._jugar_turno_equipo(self.equipo2, "equipo 2")
 
     def _jugar_turno_equipo(self, equipo, clave_equipo):
         for jugador in equipo.jugadores:
@@ -58,7 +59,7 @@ class Ronda:
             jugador.puntaje_total += puntaje
 
     def _realizar_lanzamiento_grupo(self):
-        for equipo, clave in [(self.equipo1, "equipo1"), (self.equipo2, "equipo2")]:
+        for equipo, clave in [(self.equipo1, "equipo 1"), (self.equipo2, "equipo 2")]:
             jugador = max(equipo.jugadores, key=lambda j: j.suerte)
             tiro = self.blanco.realizar_tiro(jugador)
             self.resultado[clave]["puntaje_grupo"] += tiro
@@ -80,9 +81,13 @@ class Ronda:
             jugador_id = jugador_tiros["jugador_id"]
 
             if jugador_id in ids_equipo1:
-                self.resultado["equipo1"]["tiros_jugadores"][jugador_id] = jugador_tiros
+                self.resultado["equipo 1"]["tiros_jugadores"][
+                    jugador_id
+                ] = jugador_tiros
             elif jugador_id in ids_equipo2:
-                self.resultado["equipo2"]["tiros_jugadores"][jugador_id] = jugador_tiros
+                self.resultado["equipo 2"]["tiros_jugadores"][
+                    jugador_id
+                ] = jugador_tiros
 
     def _manejar_lanzamientos_extra_consecutivos(self):
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
@@ -92,12 +97,15 @@ class Ronda:
                     self.equipo1 if jugador in self.equipo1.jugadores else self.equipo2
                 )
                 equipo.puntaje_total += tiro
-                self.resultado[equipo.nombre.lower()]["puntaje_grupo"] += tiro
+
+                clave_equipo = "equipo 1" if equipo == self.equipo1 else "equipo 2"
+                self.resultado[clave_equipo]["puntaje_grupo"] += tiro
+
                 jugador.consecutivo_extra_ganados = 0
 
     def _determinar_ganador_individual(self):
-        puntaje1 = self.resultado["equipo1"]["puntaje"]
-        puntaje2 = self.resultado["equipo2"]["puntaje"]
+        puntaje1 = self.resultado["equipo 1"]["puntaje"]
+        puntaje2 = self.resultado["equipo 2"]["puntaje"]
 
         if puntaje1 > puntaje2:
             self._asignar_ganador_ronda(self.equipo1)

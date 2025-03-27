@@ -33,20 +33,20 @@ def jugar():
 
     resultados_juegos = []  # Lista para almacenar los resultados de los 10 juegos
 
-    for i in range(1):  # Iterar 10 veces para simular 10 juegos
-        juego = Juego(equipo_1, equipo_2, num_rondas=1, juego_actual=i+1)
+    for i in range(20000):  # Iterar 10 veces para simular 10 juegos
+        juego = Juego(equipo_1, equipo_2, num_rondas=1, juego_actual=i + 1)
         juego.jugar_partida_completa()
 
         # Guardar los resultados de cada juego
         resultado_juego = {
             "id_juego": juego.id_juego,
-            "numero_juego": juego.juego_actual, 
-            "equipo1": {
+            "numero_juego": juego.juego_actual,
+            "equipo 1": {
                 "nombre": juego.equipo1.nombre,
                 "rondas_ganadas": juego.equipo1.rondas_ganadas,
                 "puntaje_total": juego.equipo1.puntaje_total,
             },
-            "equipo2": {
+            "equipo 2": {
                 "nombre": juego.equipo2.nombre,
                 "rondas_ganadas": juego.equipo2.rondas_ganadas,
                 "puntaje_total": juego.equipo2.puntaje_total,
@@ -92,6 +92,7 @@ def jugar():
         resultado_final=resultado_final,
         simulacion_data=simulacion_data,
     )
+
 
 @app.route("/graficas", methods=["GET"])
 def graficas():
