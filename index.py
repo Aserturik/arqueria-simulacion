@@ -35,13 +35,13 @@ def jugar():
     with open("resultados_acumulados.json", "w") as f:
         f.write("[\n")  # Iniciamos el array JSON
 
-    total_juegos = 50
+    total_juegos = 20000
     # Guarda solo el último juego para mostrar en la interfaz
     ultimo_juego = None
 
     for i in range(total_juegos):
         # Crear y jugar el juego
-        juego = Juego(equipo_1, equipo_2, num_rondas=5, juego_actual=i + 1)
+        juego = Juego(equipo_1, equipo_2, num_rondas=10, juego_actual=i + 1)
         juego.jugar_partida_completa()
         print(f"\n--- JUEGO {i + 1} ---")
 

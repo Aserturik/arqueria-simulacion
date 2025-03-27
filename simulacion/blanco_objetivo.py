@@ -44,8 +44,8 @@ class Blanco:
     def realizar_tiro(self, jugador) -> int:
         """Realiza un tiro y devuelve el puntaje obtenido"""
         # Verificar resistencia
-        if jugador.resistencia_actual < self.TIRO_RESISTENCIA_COST:
-            return self.ZONAS["ERROR"]
+        #if jugador.resistencia_actual < self.TIRO_RESISTENCIA_COST:
+        #    return self.ZONAS["ERROR"]
 
         # Actualizar estado del jugador
         jugador.resistencia_actual -= self.TIRO_RESISTENCIA_COST

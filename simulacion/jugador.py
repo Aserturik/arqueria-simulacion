@@ -12,7 +12,6 @@ class Jugador:
         self.puntaje_total = 0
         self.cansancio_acumulado = 0
         self.tiros_realizados = 0
-        self.resistencia_previa = 0
 
         # Relaciones requeridas por la lógica de Ronda
         self.resistencia_actual = self.resistencia  # Valor actual de resistencia
@@ -36,7 +35,7 @@ class Jugador:
 
     def reiniciar_habilidades(self):
         """Restaura las habilidades a sus valores iniciales"""
-        self.resistencia = self.resistencia_inicial
+        self.resistencia = self.resistencia_inicial - self.cansancio_acumulado
         self.experiencia = self.experiencia_inicial
         self.suerte = self.suerte_inicial
 
@@ -56,6 +55,10 @@ class Jugador:
             self.resistencia_actual >= 5
         )  # Mismo valor que Blanco.TIRO_RESISTENCIA_COST
 
+    def actualizar_resistencia(self):
+        """Actualiza la resistencia actual del jugador al final de cada tiro"""
+        self.resistencia_actual = self.resistencia_inicial - self.cansancio_acumulado
+
     def finalizar_ronda(self):
         """
         Al final de cada ronda:
@@ -68,12 +71,14 @@ class Jugador:
 
         # Actualizamos la resistencia actual para la lógica de la ronda
         self.resistencia_actual = self.resistencia
+        print("resistencia al final de la ronda: " + self.resistencia)
         self.experiencia += 1
 
     def realizar_tiro(self):
         if self.resistencia_actual >= 5:
             self.resistencia_actual -= 5
             self.tiros_realizados += 1
+            print("lancé y tengo resistencia " + self.resistencia_actual)
             # Calcula el puntaje basado en resistencia, experiencia y suerte
             return True
         else:

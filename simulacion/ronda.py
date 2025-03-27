@@ -29,22 +29,22 @@ class Ronda:
         }
 
     def jugar(self):
-        self._preparar_jugadores()
+        #self._preparar_jugadores()
         self._jugar_turnos_equipos()
-        self._realizar_lanzamiento_grupo()
-        self._manejar_lanzamientos_extra_consecutivos()
+        #self._realizar_lanzamiento_grupo()
+        #self._manejar_lanzamientos_extra_consecutivos()
         self._determinar_ganador_individual()
         self._actualizar_experiencia()
         self._recuperar_resistencia()
-        self._registrar_tiros_jugadores()
+        #self._registrar_tiros_jugadores()
         return self.resultado
 
     def _preparar_jugadores(self):
         """
         Prepara a los jugadores para la ronda, restaurando su resistencia original
+        menos una o dos unidades para representar el cansancio acumulado.
         """
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
-            jugador.reiniciar_habilidades()
             jugador.tiros_realizados = 0
 
     def _jugar_turnos_equipos(self):
@@ -152,4 +152,6 @@ class Ronda:
 
     def _recuperar_resistencia(self):
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
-            jugador.resistencia = jugador.resistencia_actual - random.randint(1, 2)
+            jugador.cansancio_acumulado += random.randint(1, 2)
+            jugador.actualizar_resistencia()
+            #todo solo actualiza el cansancio acumulado. No actualiza la resistencia actual
