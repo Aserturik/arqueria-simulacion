@@ -19,7 +19,7 @@ class Juego:
         ronda = Ronda(self.ronda_actual, self.equipo1, self.equipo2, self.blanco)
         resultado = ronda.jugar()
         self.historial_rondas.append(resultado)
-        self._mostrar_resultados_ronda(resultado)
+        #self._mostrar_resultados_ronda(resultado)
         return resultado
 
     def jugar_partida_completa(self):
@@ -30,8 +30,6 @@ class Juego:
 
     def _mostrar_resultados_ronda(self, resultado):
         print(f"\n--- RESULTADOS RONDA {self.ronda_actual} ---")
-        # print(f"{self.equipo1.nombre}: {resultado['equipo1']['puntaje']} puntos")
-        # print(f"{self.equipo2.nombre}: {resultado['equipo2']['puntaje']} puntos")
         print(f"Ganador: {resultado['ganador_individual']}")
 
     def _finalizar_ronda(self):

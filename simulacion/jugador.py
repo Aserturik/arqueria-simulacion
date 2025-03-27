@@ -12,12 +12,10 @@ class Jugador:
         self.puntaje_total = 0
         self.cansancio_acumulado = 0
         self.tiros_realizados = 0
+        self.resistencia_previa = 0
 
         # Relaciones requeridas por la lógica de Ronda
         self.resistencia_actual = self.resistencia  # Valor actual de resistencia
-        self.resistencia_previa = (
-            self.resistencia
-        )  # Para almacenar la resistencia antes del turno
         self.consecutivo_extra_ganados = 0  # Conteo de tiros extra consecutivos ganados
         self.punteria = random.randint(50, 100)  # Valor de puntería para desempates
         self.beneficio_resistencia = (
@@ -26,6 +24,7 @@ class Jugador:
 
     def _generar_habilidades(self):
         # Generamos y guardamos los valores iniciales
+        # resistencia: 35 ± 10
         self.resistencia_inicial = random.randint(25, 45)  # 35 ± 10
         self.experiencia_inicial = 10
         self.suerte_inicial = round(random.uniform(1.0, 3.0), 2)
@@ -43,7 +42,6 @@ class Jugador:
 
         # También se actualizan las propiedades relacionadas con la ronda
         self.resistencia_actual = self.resistencia
-        self.resistencia_previa = self.resistencia
         self.consecutivo_extra_ganados = 0
         self.beneficio_resistencia = False
 

@@ -40,9 +40,12 @@ class Ronda:
         return self.resultado
 
     def _preparar_jugadores(self):
+        """
+        Prepara a los jugadores para la ronda, restaurando su resistencia original
+        """
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
-            jugador.resistencia_previa = jugador.resistencia_actual
-            jugador.resistencia_actual = jugador.resistencia_previa
+            jugador.reiniciar_habilidades()
+            jugador.tiros_realizados = 0
 
     def _jugar_turnos_equipos(self):
         self._jugar_turno_equipo(self.equipo1, "equipo 1")
@@ -149,5 +152,4 @@ class Ronda:
 
     def _recuperar_resistencia(self):
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
-            perdida = 1 if jugador.beneficio_resistencia else random.randint(1, 2)
-            jugador.resistencia_actual = jugador.resistencia_previa - perdida
+            jugador.resistencia = jugador.resistencia_actual - random.randint(1, 2)
