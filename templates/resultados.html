@@ -1,57 +1,396 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Resultados del Juego</title>
-</head>
-<body>
-    <h1>Resultados del Juego</h1>
-    <p>{{ resultado_final }}</p>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      h1,
+      h2 {
+        color: #333;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ddd;
+      }
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+      }
+      .pagination button {
+        margin: 0 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+      .current-page {
+        font-weight: bold;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+      }
+      .filters {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #f8f8f8;
+        border-radius: 5px;
+      }
+      .resumen-actual {
+        margin-bottom: 30px;
+        padding: 15px;
+        background-color: #e6f7ff;
+        border-radius: 5px;
+        border-left: 5px solid #1890ff;
+      }
+      .games-table {
+        max-height: 600px;
+        overflow-y: auto;
+        margin-bottom: 20px;
+      }
+      .loading {
+        text-align: center;
+        padding: 20px;
+        font-size: 18px;
+      }
+      .game-details {
+        border: 1px solid #ddd;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        overflow: hidden;
+      }
+      .game-header {
+        padding: 10px;
+        background-color: #f2f2f2;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+      }
+      .game-body {
+        padding: 15px;
+        display: none;
+      }
+      .active .game-body {
+        display: block;
+      }
+      .volver {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 15px;
+        background-color: #4caf50;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Resultados de los Juegos</h1>
 
-    <h2>Estadísticas por Ronda</h2>
-    <table border="1" cellspacing="0" cellpadding="5">
-        <thead>
+      <!-- Resumen del juego actual -->
+      <div class="resumen-actual">
+        <h2>Último Juego Simulado</h2>
+        <p>{{ resultado_final }}</p>
+
+        <h3>Estadísticas por Ronda</h3>
+        <table border="1" cellspacing="0" cellpadding="5">
+          <thead>
             <tr>
-                <th>Ronda</th>
-                <th>{{ simulacion_data.equipo1.nombre }} (Puntos)</th>
-                <th>{{ simulacion_data.equipo2.nombre }} (Puntos)</th>
+              <th>Ronda</th>
+              <th>{{ simulacion_data.equipo1.nombre }} (Puntos)</th>
+              <th>{{ simulacion_data.equipo2.nombre }} (Puntos)</th>
             </tr>
-        </thead>
-        <tbody>
+          </thead>
+          <tbody>
             {% for ronda in simulacion_data.historial_puntajes %}
             <tr>
-                <td>{{ ronda.ronda }}</td>
-                <td>{{ ronda.equipo1.puntaje }}</td>
-                <td>{{ ronda.equipo2.puntaje }}</td>
+              <td>{{ ronda.ronda }}</td>
+              <td>{{ ronda.equipo1.puntaje }}</td>
+              <td>{{ ronda.equipo2.puntaje }}</td>
             </tr>
             {% endfor %}
-        </tbody>
-    </table>
+          </tbody>
+        </table>
 
-    <h2>Resumen Final</h2>
-    <table border="1" cellspacing="0" cellpadding="5">
-        <tr>
+        <h3>Resumen Final</h3>
+        <table border="1" cellspacing="0" cellpadding="5">
+          <tr>
             <th>Equipo</th>
             <th>Rondas Ganadas</th>
             <th>Puntaje Total</th>
-        </tr>
-        <tr>
+          </tr>
+          <tr>
             <td>{{ simulacion_data.equipo1.nombre }}</td>
             <td>{{ simulacion_data.equipo1.rondas_ganadas }}</td>
             <td>{{ simulacion_data.equipo1.puntaje_total }}</td>
-        </tr>
-        <tr>
+          </tr>
+          <tr>
             <td>{{ simulacion_data.equipo2.nombre }}</td>
             <td>{{ simulacion_data.equipo2.rondas_ganadas }}</td>
             <td>{{ simulacion_data.equipo2.puntaje_total }}</td>
-        </tr>
-    </table>
+          </tr>
+        </table>
 
-    <form action="{{ url_for('graficas') }}" method="get">
-        <input type="hidden" name="game_id" value="{{ simulacion_data.id_juego }}">
-        <button type="submit">Generar Gráficas</button>
-    </form>
-    <br>
-    <a href="{{ url_for('index') }}">Volver</a>
-</body>
+        <form action="{{ url_for('graficas') }}" method="get">
+          <input
+            type="hidden"
+            name="game_id"
+            value="{{ simulacion_data.id_juego }}"
+          />
+          <button type="submit">Generar Gráficas</button>
+        </form>
+      </div>
+
+      <!-- Filtros para todos los juegos -->
+      <div class="filters">
+        <h2>Todos los Juegos</h2>
+        <div>
+          <label for="juego-desde">Mostrar juegos desde:</label>
+          <input type="number" id="juego-desde" min="1" value="1" />
+
+          <label for="juego-hasta">hasta:</label>
+          <input type="number" id="juego-hasta" min="1" value="50" />
+
+          <button id="filtrar-btn">Filtrar</button>
+
+          <label for="items-per-page">Juegos por página:</label>
+          <select id="items-per-page">
+            <option value="10">10</option>
+            <option value="20" selected>20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Contenedor para todos los juegos -->
+      <div id="loading" class="loading">Cargando resultados...</div>
+      <div id="games-container"></div>
+
+      <!-- Paginación -->
+      <div class="pagination" id="pagination"></div>
+
+      <a href="{{ url_for('index') }}" class="volver">Volver al Inicio</a>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        let allGames = [];
+        let currentPage = 1;
+        let itemsPerPage = 20;
+        let filteredGames = [];
+
+        // Cargar los datos JSON
+        fetch("/resultados_acumulados.json")
+          .then((response) => response.json())
+          .then((data) => {
+            allGames = data;
+            document.getElementById("loading").style.display = "none";
+
+            // Inicializar filtros con valores máximos
+            //document.getElementById('juego-hasta').max = allGames.length;
+            //document.getElementById('juego-hasta').value = Math.min(50, allGames.length);
+            if (allGames.length > 0) {
+              const minGame = Math.min(...allGames.map((g) => g.numero_juego));
+              const maxGame = Math.max(...allGames.map((g) => g.numero_juego));
+
+              document.getElementById("juego-desde").min = minGame;
+              document.getElementById("juego-desde").value = minGame;
+
+              document.getElementById("juego-hasta").max = maxGame;
+              document.getElementById("juego-hasta").value = maxGame;
+            }
+
+            // Aplicar filtros iniciales
+            applyFilters();
+          })
+          .catch((error) => {
+            console.error("Error al cargar los datos:", error);
+            document.getElementById("loading").textContent =
+              "Error al cargar los datos. Por favor, intenta de nuevo.";
+          });
+
+        // Manejar cambios en la cantidad de items por página
+        document
+          .getElementById("items-per-page")
+          .addEventListener("change", function () {
+            itemsPerPage = parseInt(this.value);
+            currentPage = 1;
+            renderGames();
+          });
+
+        // Manejar botón de filtrado
+        document
+          .getElementById("filtrar-btn")
+          .addEventListener("click", applyFilters);
+
+        function applyFilters() {
+          const desde =
+            parseInt(document.getElementById("juego-desde").value) || 1;
+          const hasta =
+            parseInt(document.getElementById("juego-hasta").value) ||
+            allGames.length;
+
+          // Filtrar juegos por número
+          filteredGames = allGames.filter((game) => {
+            const gameNumber = game.numero_juego;
+            return gameNumber >= desde && gameNumber <= hasta;
+          });
+
+          currentPage = 1;
+          renderGames();
+        }
+
+        function renderGames() {
+          const gamesContainer = document.getElementById("games-container");
+          gamesContainer.innerHTML = "";
+
+          // Calcular índices para paginación
+          const startIndex = (currentPage - 1) * itemsPerPage;
+          const endIndex = Math.min(
+            startIndex + itemsPerPage,
+            filteredGames.length
+          );
+
+          // Mostrar juegos para la página actual
+          if (filteredGames.length === 0) {
+            gamesContainer.innerHTML =
+              "<p>No se encontraron juegos con los filtros aplicados.</p>";
+            renderPagination(0);
+            return;
+          }
+
+          for (let i = startIndex; i < endIndex; i++) {
+            const game = filteredGames[i];
+
+            const gameDiv = document.createElement("div");
+            gameDiv.className = "game-details";
+
+            const gameHeader = document.createElement("div");
+            gameHeader.className = "game-header";
+            gameHeader.innerHTML = `
+                        <span>Juego #${game.numero_juego}</span>
+                        <span>${game.equipo_1.nombre}: ${game.equipo_1.rondas_ganadas} vs ${game.equipo_2.nombre}: ${game.equipo_2.rondas_ganadas}</span>
+                    `;
+            gameHeader.addEventListener("click", function () {
+              gameDiv.classList.toggle("active");
+            });
+
+            const gameBody = document.createElement("div");
+            gameBody.className = "game-body";
+            gameBody.innerHTML = `
+                        <p><strong>ID del Juego:</strong> ${game.id_juego}</p>
+                        <table>
+                            <tr>
+                                <th>Equipo</th>
+                                <th>Rondas Ganadas</th>
+                                <th>Puntaje Total</th>
+                            </tr>
+                            <tr>
+                                <td>${game.equipo_1.nombre}</td>
+                                <td>${game.equipo_1.rondas_ganadas}</td>
+                                <td>${game.equipo_1.puntaje_total}</td>
+                            </tr>
+                            <tr>
+                                <td>${game.equipo_2.nombre}</td>
+                                <td>${game.equipo_2.rondas_ganadas}</td>
+                                <td>${game.equipo_2.puntaje_total}</td>
+                            </tr>
+                        </table>
+                    `;
+
+            gameDiv.appendChild(gameHeader);
+            gameDiv.appendChild(gameBody);
+            gamesContainer.appendChild(gameDiv);
+          }
+
+          renderPagination(filteredGames.length);
+        }
+
+        function renderPagination(totalItems) {
+          const paginationContainer = document.getElementById("pagination");
+          paginationContainer.innerHTML = "";
+
+          if (totalItems === 0) return;
+
+          const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+          // Mostrar número limitado de botones de página
+          const maxVisiblePages = 7;
+          let startPage = Math.max(
+            1,
+            currentPage - Math.floor(maxVisiblePages / 2)
+          );
+          let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+          if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+          }
+
+          // Botón de primera página
+          if (startPage > 1) {
+            addPageButton(1, "<<");
+            if (startPage > 2) {
+              addPageButton(null, "...");
+            }
+          }
+
+          // Botones de página numerados
+          for (let i = startPage; i <= endPage; i++) {
+            addPageButton(i);
+          }
+
+          // Botón de última página
+          if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+              addPageButton(null, "...");
+            }
+            addPageButton(totalPages, ">>");
+          }
+
+          function addPageButton(pageNum, label) {
+            const button = document.createElement("button");
+            button.textContent = label || pageNum;
+
+            if (pageNum === currentPage) {
+              button.classList.add("current-page");
+            }
+
+            if (pageNum !== null) {
+              button.addEventListener("click", function () {
+                currentPage = pageNum;
+                renderGames();
+              });
+            } else {
+              button.disabled = true;
+            }
+
+            paginationContainer.appendChild(button);
+          }
+        }
+      });
+    </script>
+  </body>
 </html>

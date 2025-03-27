@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, session, request
+from flask import Flask, render_template, redirect, url_for, session, request, send_file
 from simulacion.juego import Juego
 from simulacion.equipo import Equipo
 import numpy as np
@@ -98,6 +98,11 @@ def jugar():
         resultado_final=resultado_final,
         simulacion_data=convert_numpy(ultimo_juego),
     )
+
+
+@app.route("/resultados_acumulados.json")
+def serve_json():
+    return send_file("resultados_acumulados.json", mimetype="application/json")
 
 
 @app.route("/graficas", methods=["GET"])
