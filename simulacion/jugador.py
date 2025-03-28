@@ -10,6 +10,8 @@ class Jugador:
         self._generar_habilidades()
         self.rondas_ganadas = 0
         self.puntaje_total = 0
+        self.puntaje_juego_anterior = 0
+        self.puntaje_juego_actual = 0
         self.cansancio_acumulado = 0
         self.tiros_realizados = 0
 
@@ -83,3 +85,8 @@ class Jugador:
             return True
         else:
             return False
+        
+    def guardar_puntaje_total(self):
+        """Guarda el puntaje total acumulado del jugador"""
+        self.puntaje_juego_anterior = self.puntaje_total
+        

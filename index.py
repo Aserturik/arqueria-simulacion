@@ -35,7 +35,7 @@ def jugar():
     with open("resultados_acumulados.json", "w") as f:
         f.write("[\n")  # Iniciamos el array JSON
 
-    total_juegos = 20000
+    total_juegos = 200
     # Guarda solo el último juego para mostrar en la interfaz
     ultimo_juego = None
 

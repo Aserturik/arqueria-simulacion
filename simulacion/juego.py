@@ -13,6 +13,11 @@ class Juego:
         self.ronda_actual = 0
         self.historial_rondas = []
         self.juego_actual = juego_actual
+        # Requisitos solicitados:
+        self.jugador_con_mas_suerte = None
+        self.jugador_con_mas_experiencia = None
+        self.equipo_con_mas_rondas_ganadas = None
+        self.genero_con_mas_victorias = None
 
     def jugar_ronda(self):
         self.ronda_actual += 1
@@ -23,10 +28,13 @@ class Juego:
         return resultado
 
     def jugar_partida_completa(self):
+        for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
+            jugador.guardar_puntaje_total()
+
         for _ in range(self.num_rondas):
-            print("inicio de la ronda ")
             self.jugar_ronda()
 
+        self.resultado_puntos_por_jugador()
         self._finalizar_ronda()
 
     def _mostrar_resultados_ronda(self, resultado):
@@ -53,3 +61,14 @@ class Juego:
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
             jugador.resistencia_actual = jugador.resistencia_inicial
             jugador.consecutivo_extra_ganados = 0
+
+    def resultado_puntos_por_jugador(self):
+        puntos_por_jugador = {}
+        for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
+            jugador.puntaje_juego_actual = jugador.puntaje_total - jugador.puntaje_juego_anterior
+            puntos_por_jugador[jugador.nombre] = (
+                jugador.puntaje_juego_actual
+            )
+
+        print(puntos_por_jugador)
+        return puntos_por_jugador
