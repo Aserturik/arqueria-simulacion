@@ -42,13 +42,16 @@ class Juego:
         print(f"Ganador: {resultado['ganador_individual']}")
 
     def _finalizar_ronda(self):
+        self.equipo_ganador()
         self._determinar_ganador_final()
         self._reiniciar_jugadores()
 
     def _determinar_ganador_final(self):
         print("\n--- RESULTADO FINAL ---")
-        print(f"{self.equipo1.nombre}: {self.equipo1.rondas_ganadas} rondas")
-        print(f"{self.equipo2.nombre}: {self.equipo2.rondas_ganadas} rondas")
+        print(f"{self.equipo1.nombre}: {self.equipo1.rondas_ganadas} rondas ganadas")
+        print(f"Juegos ganados: {self.equipo1.juegos_ganados}")
+        print(f"{self.equipo2.nombre}: {self.equipo2.rondas_ganadas} rondas ganadas")
+        print(f"Juegos ganados: {self.equipo2.juegos_ganados}")
 
         if self.equipo1.rondas_ganadas > self.equipo2.rondas_ganadas:
             print(f"¡{self.equipo1.nombre} gana el juego!")
@@ -72,3 +75,13 @@ class Juego:
 
         print(puntos_por_jugador)
         return puntos_por_jugador
+    
+    def equipo_ganador(self):
+        if self.equipo1.rondas_ganadas > self.equipo2.rondas_ganadas:
+            self.equipo1.juegos_ganados += 1
+        elif self.equipo2.rondas_ganadas > self.equipo1.rondas_ganadas:
+            self.equipo2.juegos_ganados += 1
+        else:
+            # Empate en el juego
+            self.equipo1.juegos_ganados += 0
+            self.equipo2.juegos_ganados += 0

@@ -41,9 +41,9 @@ def jugar():
 
     for i in range(total_juegos):
         # Crear y jugar el juego
+        print(f"\n--- JUEGO {i + 1} ---")
         juego = Juego(equipo_1, equipo_2, num_rondas=10, juego_actual=i + 1)
         juego.jugar_partida_completa()
-        print(f"\n--- JUEGO {i + 1} ---")
 
         # Guardar los resultados básicos (sin incluir todo el historial de rondas)
         resultado_basico = {
