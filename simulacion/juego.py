@@ -49,15 +49,15 @@ class Juego:
             self.equipo1.puntaje_juego += ronda["equipo 1"]["puntaje"]
             self.equipo2.puntaje_juego += ronda["equipo 2"]["puntaje"]
 
-        print("\n--- RESULTADO FINAL DEL JUEGO ---")
-        print(f"{self.equipo1.nombre}: {self.equipo1.rondas_ganadas} rondas ganadas")
-        print(f"{self.equipo2.nombre}: {self.equipo2.rondas_ganadas} rondas ganadas")
+        print("\n--- RESULTADO DEL JUEGO ---")
         if self.equipo1.puntaje_juego > self.equipo2.puntaje_juego:
             self.equipo1.juegos_ganados += 1
-            print(f"¡{self.equipo1.nombre} gana el juego!")
+            print(f"¡{self.equipo1.nombre} gana el juego! con un puntaje de {self.equipo1.puntaje_juego} puntos." )
+            print(f"¡{self.equipo2.nombre} pierde el juego! con un puntaje de {self.equipo2.puntaje_juego} puntos.")
         elif self.equipo2.puntaje_juego > self.equipo1.puntaje_juego:
             self.equipo2.juegos_ganados += 1
-            print(f"¡{self.equipo2.nombre} gana el juego!")
+            print(f"¡{self.equipo2.nombre} gana el juego! con un puntaje de {self.equipo2.puntaje_juego} puntos.")
+            print(f"¡{self.equipo1.nombre} pierde el juego! con un puntaje de {self.equipo1.puntaje_juego} puntos.")
         else:
             # Empate en el juego
             self.equipo1.juegos_ganados += 0
