@@ -16,6 +16,7 @@ class Equipo:
         self.jugadores = self._generar_jugadores(num_jugadores)
         self.rondas_ganadas = 0
         self.puntaje_total = 0
+        self.puntaje_juego = 0
         self.juegos_ganados = 0
         self.jugadores_por_id = {jugador.user_id: jugador for jugador in self.jugadores}
 

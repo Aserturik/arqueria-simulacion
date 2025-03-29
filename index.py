@@ -35,7 +35,7 @@ def jugar():
     with open("resultados_acumulados.json", "w") as f:
         f.write("[\n")  # Iniciamos el array JSON
 
-    total_juegos = 2000
+    total_juegos = 500
     # Guarda solo el último juego para mostrar en la interfaz
     ultimo_juego = None
 
@@ -95,6 +95,10 @@ def jugar():
     # Mostrar los equipos y sus integrantes con equipos.mostrar_jugadores()
     equipo_1.mostrar_jugadores()
     equipo_2.mostrar_jugadores()
+    # mostrar los juegos ganados por cada equipo
+    print(f"\n--- RESULTADO FINAL DEL JUEGO ---")
+    print("equipo 1: ", juego.equipo1.juegos_ganados)
+    print("equipo 2: ", juego.equipo2.juegos_ganados)
 
     return render_template(
         "resultados.html",

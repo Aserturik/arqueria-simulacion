@@ -12,6 +12,7 @@ class Jugador:
         self.puntaje_total = 0
         self.puntaje_juego_anterior = 0
         self.puntaje_juego_actual = 0
+        self.puntje_ronda_actual = 0
         self.cansancio_acumulado = 0
         self.tiros_realizados = 0
 

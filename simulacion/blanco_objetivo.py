@@ -44,7 +44,7 @@ class Blanco:
     def realizar_tiro(self, jugador) -> int:
         """Realiza un tiro y devuelve el puntaje obtenido"""
         # Verificar resistencia
-        #if jugador.resistencia_actual < self.TIRO_RESISTENCIA_COST:
+        # if jugador.resistencia_actual < self.TIRO_RESISTENCIA_COST:
         #    return self.ZONAS["ERROR"]
 
         # Actualizar estado del jugador
@@ -58,6 +58,23 @@ class Blanco:
         puntaje = self.ZONAS[zona]
 
         # Registrar el tiro
+        if jugador.user_id not in self.players:
+            self._registrar_nuevo_jugador(jugador)
+
+        self.players[jugador.user_id].lanzamientos.append(
+            Lanzamiento(coordenadas=coordenadas, zona=self.ZONAS[zona], puntaje=puntaje)
+        )
+
+        return puntaje
+
+    def realizar_tiro_desempate(self, jugador):
+        # igual que el realizar tiro pero sin restar resistencia
+        jugador.reiniciar_suerte()
+
+        probs = self._ajustar_probabilidades(jugador)
+        zona, coordenadas = self._generar_tiro(probs)
+        puntaje = self.ZONAS[zona]
+
         if jugador.user_id not in self.players:
             self._registrar_nuevo_jugador(jugador)
 

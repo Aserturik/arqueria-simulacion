@@ -25,7 +25,6 @@ class Juego:
         resultado = ronda.jugar()
         self.historial_rondas.append(resultado)
         # self._mostrar_resultados_ronda(resultado)
-        return resultado
 
     def jugar_partida_completa(self):
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
@@ -35,32 +34,41 @@ class Juego:
             self.jugar_ronda()
 
         self.resultado_puntos_por_jugador()
-        self._finalizar_ronda()
+        self._finalizar_juego()
 
     def _mostrar_resultados_ronda(self, resultado):
         print(f"\n--- RESULTADOS RONDA {self.ronda_actual} ---")
         print(f"Ganador: {resultado['ganador_individual']}")
 
-    def _finalizar_ronda(self):
-        self.equipo_ganador()
-        self._determinar_ganador_final()
-        self._reiniciar_jugadores()
+    def _finalizar_juego(self):
+        self.equipo_ganador_juego()
+        self.reiniciar_equipos()
 
-    def _determinar_ganador_final(self):
-        print("\n--- RESULTADO FINAL ---")
+    def equipo_ganador_juego(self):
+        for ronda in self.historial_rondas:
+            self.equipo1.puntaje_juego += ronda["equipo 1"]["puntaje"]
+            self.equipo2.puntaje_juego += ronda["equipo 2"]["puntaje"]
+
+        print("\n--- RESULTADO FINAL DEL JUEGO ---")
         print(f"{self.equipo1.nombre}: {self.equipo1.rondas_ganadas} rondas ganadas")
-        print(f"Juegos ganados: {self.equipo1.juegos_ganados}")
         print(f"{self.equipo2.nombre}: {self.equipo2.rondas_ganadas} rondas ganadas")
-        print(f"Juegos ganados: {self.equipo2.juegos_ganados}")
-
-        if self.equipo1.rondas_ganadas > self.equipo2.rondas_ganadas:
+        if self.equipo1.puntaje_juego > self.equipo2.puntaje_juego:
+            self.equipo1.juegos_ganados += 1
             print(f"¡{self.equipo1.nombre} gana el juego!")
-        elif self.equipo2.rondas_ganadas > self.equipo1.rondas_ganadas:
+        elif self.equipo2.puntaje_juego > self.equipo1.puntaje_juego:
+            self.equipo2.juegos_ganados += 1
             print(f"¡{self.equipo2.nombre} gana el juego!")
         else:
-            print("¡Empate!")
+            # Empate en el juego
+            self.equipo1.juegos_ganados += 0
+            self.equipo2.juegos_ganados += 0
+            print("¡Empate en el juego!")
 
-    def _reiniciar_jugadores(self):
+    def reiniciar_equipos(self):
+        # se reinician las estadísticas de los equipos
+        self.equipo1.puntaje_juego = 0
+        self.equipo2.puntaje_juego = 0
+
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
             jugador.resistencia_actual = jugador.resistencia_inicial
             jugador.consecutivo_extra_ganados = 0
@@ -68,20 +76,10 @@ class Juego:
     def resultado_puntos_por_jugador(self):
         puntos_por_jugador = {}
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
-            jugador.puntaje_juego_actual = jugador.puntaje_total - jugador.puntaje_juego_anterior
-            puntos_por_jugador[jugador.nombre] = (
-                jugador.puntaje_juego_actual
+            jugador.puntaje_juego_actual = (
+                jugador.puntaje_total - jugador.puntaje_juego_anterior
             )
+            puntos_por_jugador[jugador.nombre] = jugador.puntaje_juego_actual
 
         print(puntos_por_jugador)
         return puntos_por_jugador
-    
-    def equipo_ganador(self):
-        if self.equipo1.rondas_ganadas > self.equipo2.rondas_ganadas:
-            self.equipo1.juegos_ganados += 1
-        elif self.equipo2.rondas_ganadas > self.equipo1.rondas_ganadas:
-            self.equipo2.juegos_ganados += 1
-        else:
-            # Empate en el juego
-            self.equipo1.juegos_ganados += 0
-            self.equipo2.juegos_ganados += 0

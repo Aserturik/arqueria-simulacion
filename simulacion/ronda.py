@@ -7,6 +7,7 @@ class Ronda:
         self.equipo1 = equipo1
         self.equipo2 = equipo2
         self.blanco = blanco
+        self.jugador_ganador = None
         self.resultado = {
             "ronda actual": numero_ronda,
             "equipo 1": {
@@ -29,15 +30,15 @@ class Ronda:
         }
 
     def jugar(self):
-        #self._preparar_jugadores()
+        # self._preparar_jugadores()
         self._jugar_turnos_equipos()
         self._jugar_tiro_extra()
-        #self._realizar_lanzamiento_grupo()
-        #self._manejar_lanzamientos_extra_consecutivos()
-        self._determinar_ganador_individual()
+        self._determinar_jugador_ganador()
+        # self._manejar_lanzamientos_extra_consecutivos()
+        self._determinar_equipo_ganador()
         self._actualizar_experiencia()
         self._recuperar_resistencia()
-        #self._registrar_tiros_jugadores()
+        # self._registrar_tiros_jugadores()
         return self.resultado
 
     def _preparar_jugadores(self):
@@ -61,20 +62,14 @@ class Ronda:
             self.resultado[clave_equipo]["puntaje"] += puntaje
             self.resultado[clave_equipo]["tiros"] += tiros
             jugador.puntaje_total += puntaje
-    
+            jugador.puntaje_ronda_actual = puntaje
+
     def _jugar_tiro_extra(self):
         # el jugador con más suerte de cada equipo lanza un tiro extra
         for equipo, clave in [(self.equipo1, "equipo 1"), (self.equipo2, "equipo 2")]:
             jugador = max(equipo.jugadores, key=lambda j: j.suerte)
             tiro = self.blanco.realizar_tiro(jugador)
             self.resultado[clave]["puntaje"] += tiro
-
-    def _realizar_lanzamiento_grupo(self):
-        for equipo, clave in [(self.equipo1, "equipo 1"), (self.equipo2, "equipo 2")]:
-            jugador = max(equipo.jugadores, key=lambda j: j.suerte)
-            tiro = self.blanco.realizar_tiro(jugador)
-            self.resultado[clave]["puntaje_grupo"] += tiro
-            equipo.puntaje_total += tiro
 
     def _registrar_tiros_jugadores(self):
         """
@@ -114,7 +109,7 @@ class Ronda:
 
                 jugador.consecutivo_extra_ganados = 0
 
-    def _determinar_ganador_individual(self):
+    def _determinar_equipo_ganador(self):
         puntaje1 = self.resultado["equipo 1"]["puntaje"]
         puntaje2 = self.resultado["equipo 2"]["puntaje"]
 
@@ -123,15 +118,87 @@ class Ronda:
         elif puntaje2 > puntaje1:
             self._asignar_ganador_ronda(self.equipo2)
         else:
-            self._desempatar_ronda()
+            # se salta a la siguiente ronda
+            self.resultado["ganador_individual"] = "EMPATE"
+
+    def _determinar_jugador_ganador(self):
+        """
+        Determina el jugador ganador de la ronda actual.
+
+        Evalúa los puntajes de todos los jugadores de ambos equipos y selecciona al que
+        tiene el puntaje más alto como ganador. En caso de empate en los puntajes más altos,
+        se realizan lanzamientos adicionales (desempate) hasta que se determine un único ganador.
+
+        Proceso:
+        1. Encuentra el puntaje máximo entre todos los jugadores.
+        2. Identifica todos los jugadores que tienen ese puntaje.
+        3. Si solo hay un jugador con el puntaje máximo, es declarado ganador.
+        4. Si hay múltiples jugadores empatados, inicia un proceso de desempate con lanzamientos
+           adicionales hasta que solo quede un ganador.
+
+        Resultado:
+        - Actualiza el atributo `jugador_ganador` con el jugador que ganó la ronda.
+        """
+        maximo = 0
+        for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
+            if jugador.puntaje_ronda_actual > maximo:
+                maximo = jugador.puntaje_ronda_actual
+
+        # Find all players with the maximum score
+        jugadores_empatados = [
+            jugador
+            for jugador in self.equipo1.jugadores + self.equipo2.jugadores
+            if jugador.puntaje_ronda_actual == maximo
+        ]
+
+        # If there's only one player with the maximum score, they're the winner
+        if len(jugadores_empatados) == 1:
+            self.jugador_ganador = jugadores_empatados[0]
+        else:
+            # Call the tiebreaker function to determine a winner
+            self.jugador_ganador = self._desempate(jugadores_empatados)
+
+    def _desempate(self, jugadores_empatados):
+        """
+        Realiza un desempate entre jugadores empatados en puntaje.
+
+        Todos los jugadores empatados realizan un tiro adicional. Solo los jugadores con
+        el puntaje más alto en este tiro continúan en la siguiente ronda de desempate.
+        El proceso se repite hasta que quede un solo ganador.
+
+        Args:
+          jugadores_empatados (list): Lista de jugadores con el mismo puntaje máximo
+
+        Returns:
+          Jugador: El jugador ganador tras el desempate
+        """
+        contendientes = jugadores_empatados.copy()
+
+        while len(contendientes) > 1:
+            # Cada jugador realiza un tiro
+            puntajes = {}
+            for jugador in contendientes:
+                puntaje = self.blanco.realizar_tiro_desempate(jugador)
+                puntajes[jugador] = puntaje
+
+            # Encontrar el puntaje máximo de esta ronda de desempate
+            max_puntaje = max(puntajes.values())
+
+            # Filtrar jugadores que obtuvieron el puntaje máximo
+            contendientes = [
+                jugador for jugador in contendientes if puntajes[jugador] == max_puntaje
+            ]
+
+        # Devolver el único jugador que queda en contendientes
+        return contendientes[0]
 
     def _desempatar_ronda(self):
         while True:
             jugador1 = max(self.equipo1.jugadores, key=lambda j: j.punteria)
             jugador2 = max(self.equipo2.jugadores, key=lambda j: j.punteria)
-            t1, t2 = self.blanco.realizar_tiro(jugador1), self.blanco.realizar_tiro(
-                jugador2
-            )
+            t1, t2 = self.blanco.realizar_tiro_desempate(
+                jugador1
+            ), self.blanco.realizar_tiro_desempate(jugador2)
 
             if t1 > t2:
                 self._asignar_ganador_ronda(self.equipo1, jugador1)
@@ -162,4 +229,4 @@ class Ronda:
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
             jugador.cansancio_acumulado += random.randint(1, 2)
             jugador.actualizar_resistencia()
-            #todo solo actualiza el cansancio acumulado. No actualiza la resistencia actual
+            # todo solo actualiza el cansancio acumulado. No actualiza la resistencia actual
