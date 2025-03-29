@@ -31,6 +31,7 @@ class Ronda:
     def jugar(self):
         #self._preparar_jugadores()
         self._jugar_turnos_equipos()
+        self._jugar_tiro_extra()
         #self._realizar_lanzamiento_grupo()
         #self._manejar_lanzamientos_extra_consecutivos()
         self._determinar_ganador_individual()
@@ -60,6 +61,13 @@ class Ronda:
             self.resultado[clave_equipo]["puntaje"] += puntaje
             self.resultado[clave_equipo]["tiros"] += tiros
             jugador.puntaje_total += puntaje
+    
+    def _jugar_tiro_extra(self):
+        # el jugador con más suerte de cada equipo lanza un tiro extra
+        for equipo, clave in [(self.equipo1, "equipo 1"), (self.equipo2, "equipo 2")]:
+            jugador = max(equipo.jugadores, key=lambda j: j.suerte)
+            tiro = self.blanco.realizar_tiro(jugador)
+            self.resultado[clave]["puntaje"] += tiro
 
     def _realizar_lanzamiento_grupo(self):
         for equipo, clave in [(self.equipo1, "equipo 1"), (self.equipo2, "equipo 2")]:
