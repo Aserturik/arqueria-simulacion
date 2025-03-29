@@ -238,12 +238,21 @@ class Ronda:
             jugador_extra.consecutivo_extra_ganados += 1
 
     def _actualizar_experiencia(self):
-        """
-        Actualiza la experiencia de los jugadores y determina el jugador con más experiencia.
-        """
+        """Actualiza la experiencia solo del jugador ganador de la ronda."""
+        # Solo el jugador ganador obtiene 3 puntos de experiencia
+        if self.jugador_ganador:
+            self.jugador_ganador.experiencia += 3
+            print(
+                f"{self.jugador_ganador.nombre} ganó la ronda y aumentó su experiencia a {self.jugador_ganador.experiencia}"
+            )
 
-        self._aumentar_experiencia(self.equipo1)
-        self._aumentar_experiencia(self.equipo2)
+            # Activar beneficio si alcanza los 19 puntos
+            if self.jugador_ganador.experiencia >= 19:
+                self.jugador_ganador.beneficio_resistencia = True
+                self.jugador_ganador.rondas_con_beneficio = 2  # Beneficio por 2 rondas
+                print(
+                    f"{self.jugador_ganador.nombre} activó el beneficio de resistencia por 2 rondas"
+                )
 
         # Encontrar el jugador con más experiencia entre todos los jugadores
         todos_los_jugadores = self.equipo1.jugadores + self.equipo2.jugadores
@@ -254,14 +263,19 @@ class Ronda:
         else:
             self.jugador_con_mas_experiencia = None
 
-    def _aumentar_experiencia(self, equipo):
-        for jugador in equipo.jugadores:
-            jugador.experiencia += 3
-            if jugador.experiencia >= 19:
-                jugador.beneficio_resistencia = True
-
     def _recuperar_resistencia(self):
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
             jugador.cansancio_acumulado += random.randint(1, 2)
+
+            # Decrementar contador de rondas con beneficio si está activo
+            if jugador.beneficio_resistencia and jugador.rondas_con_beneficio > 0:
+                jugador.rondas_con_beneficio -= 1
+                print(
+                    f"{jugador.nombre} tiene beneficio por {jugador.rondas_con_beneficio} rondas más"
+                )
+                # Desactivar beneficio si se acabaron las rondas
+                if jugador.rondas_con_beneficio <= 0:
+                    jugador.beneficio_resistencia = False
+                    print(f"{jugador.nombre} perdió su beneficio de resistencia")
+
             jugador.actualizar_resistencia()
-            # todo solo actualiza el cansancio acumulado. No actualiza la resistencia actual

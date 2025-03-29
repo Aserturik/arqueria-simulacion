@@ -29,6 +29,7 @@ class Jugador:
         # resistencia: 35 ± 10
         self.resistencia_inicial = random.randint(25, 45)  # 35 ± 10
         self.experiencia_inicial = 10
+        self.rondas_con_beneficio = 0
 
         # Asignamos los valores actuales
         self.resistencia = self.resistencia_inicial
@@ -55,6 +56,8 @@ class Jugador:
         self.cansancio_acumulado = 0
         self.tiros_realizados = 0
         self.consecutivo_extra_ganados = 0
+        self.beneficio_resistencia = False
+        self.experiencia = 10
 
     def puede_tirar(self):
         """Verifica si el jugador tiene suficiente resistencia para realizar un tiro"""
@@ -64,7 +67,19 @@ class Jugador:
 
     def actualizar_resistencia(self):
         """Actualiza la resistencia actual del jugador al final de cada tiro"""
-        self.resistencia_actual = self.resistencia_inicial - self.cansancio_acumulado
+        # Si el jugador tiene 19+ puntos de experiencia, pierde menos resistencia
+        if self.experiencia >= 19 and self.beneficio_resistencia:
+            # Solo pierde 1 punto en lugar de la pérdida normal
+            self.resistencia_actual = self.resistencia_inicial - max(
+                1, self.cansancio_acumulado - 1
+            )
+            print(
+                f"{self.nombre} tiene beneficio de experiencia: resistencia {self.resistencia_actual}"
+            )
+        else:
+            self.resistencia_actual = (
+                self.resistencia_inicial - self.cansancio_acumulado
+            )
 
     def finalizar_ronda(self):
         """

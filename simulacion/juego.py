@@ -13,6 +13,7 @@ class Juego:
         self.ronda_actual = 0
         self.historial_rondas = []
         self.juego_actual = juego_actual
+        self.exxperiencia_maxima = 0
         # Requisitos solicitados:
         self.jugador_con_mas_suerte = None
         self.jugador_con_mas_experiencia = None
@@ -124,34 +125,19 @@ class Juego:
             self.jugador_con_mas_suerte = "No determinado"
 
     def determinar_jugador_con_mas_experiencia(self):
-        # similar a determinar_jugador_con_mas_suerte
-        # se busca en cada ronda el jugador con más experiencia
-        # el atributo "jugador_con_mas_experiencia" de la ronda
-        # el jugador que más veces aparezca como jugador con más experiencia
-        # es el jugador con más experiencia del juego
-        jugadores_experiencia = {}
-        for ronda in self.historial_rondas:
-            # Verificar que no sea "No determinado" y sea un diccionario
-            if isinstance(ronda["jugador_con_mas_experiencia"], dict):
-                jugador_id = ronda["jugador_con_mas_experiencia"]["user_id"]
+        """Determina el jugador con mayor experiencia acumulada."""
+        todos_jugadores = self.equipo1.jugadores + self.equipo2.jugadores
 
-                if jugador_id not in jugadores_experiencia:
-                    jugadores_experiencia[jugador_id] = 1
-                else:
-                    jugadores_experiencia[jugador_id] += 1
-
-        # se busca el jugador con más experiencia
-        if jugadores_experiencia:
-            jugador_id_mas_experiencia = max(
-                jugadores_experiencia, key=jugadores_experiencia.get
+        if todos_jugadores:
+            # Encuentra el jugador con mayor experiencia
+            self.jugador_con_mas_experiencia = max(
+                todos_jugadores, key=lambda j: j.experiencia
             )
-
-            # se busca el jugador con más experiencia
-            for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
-                if jugador.user_id == jugador_id_mas_experiencia:
-                    self.jugador_con_mas_experiencia = jugador
-                    break
-            else:
-                self.jugador_con_mas_experiencia = "No determinado"
+            # Guarda la experiencia actual antes de que se reinicie
+            self.experiencia_maxima = self.jugador_con_mas_experiencia.experiencia
+            print(
+                f"Jugador con más experiencia: {self.jugador_con_mas_experiencia.nombre} con {self.jugador_con_mas_experiencia.experiencia} puntos"
+            )
         else:
             self.jugador_con_mas_experiencia = "No determinado"
+            self.experiencia_maxima = 10
