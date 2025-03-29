@@ -35,7 +35,7 @@ def jugar():
     with open("resultados_acumulados.json", "w") as f:
         f.write("[\n")  # Iniciamos el array JSON
 
-    total_juegos = 50
+    total_juegos = 100
     # Guarda solo el último juego para mostrar en la interfaz
     ultimo_juego = None
 
@@ -43,7 +43,7 @@ def jugar():
         # Crear y jugar el juego
         print(f"\n--- JUEGO {i + 1} ---")
         juego = Juego(equipo_1, equipo_2, num_rondas=10, juego_actual=i + 1)
-        juego.jugar_partida_completa()
+        juego.jugar_juego_completo()
 
         resultado_juegos = {
             "id_juego": juego.id_juego,
@@ -64,18 +64,19 @@ def jugar():
         # Guardar solo el último juego completo para la interfaz
         if i == total_juegos - 1:
             ultimo_juego = {
+                "id_juego": juego.id_juego,
+                "jugador_con_mas_suerte": juego.jugador_con_mas_suerte,
                 "equipo1": {
                     "nombre": juego.equipo1.nombre,
                     "rondas_ganadas": juego.equipo1.rondas_ganadas,
-                    "puntaje_total": juego.equipo1.puntaje_total,
+                    "puntaje_total": juego.equipo1.juegos_ganados,
                 },
                 "equipo2": {
                     "nombre": juego.equipo2.nombre,
                     "rondas_ganadas": juego.equipo2.rondas_ganadas,
-                    "puntaje_total": juego.equipo2.puntaje_total,
+                    "puntaje_total": juego.equipo2.juegos_ganados,
                 },
                 "id_juego": juego.id_juego,
-                "historial_rondas": juego.historial_rondas,
             }
 
             # Escribir cada resultado individual al archivo con coma solo si no es el último
@@ -100,13 +101,15 @@ def jugar():
     print(f"\n--- RESULTADO FINAL DEL JUEGO ---")
     print(
         "equipo 1: ",
-        juego.equipo1.juegos_ganados, "juegos ganados",
+        juego.equipo1.juegos_ganados,
+        "juegos ganados",
         "rondas ganadas: ",
         juego.equipo1.rondas_ganadas,
     )
     print(
         "equipo 2: ",
-        juego.equipo2.juegos_ganados, "juegos ganados",
+        juego.equipo2.juegos_ganados,
+        "juegos ganados",
         "rondas ganadas: ",
         juego.equipo2.rondas_ganadas,
     )

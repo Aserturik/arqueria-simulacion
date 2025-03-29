@@ -32,7 +32,6 @@ class Ronda:
         }
 
     def jugar(self):
-        # self._preparar_jugadores()
         self._jugar_turnos_equipos()
         self._jugar_tiro_extra()
         self._determinar_jugador_ganador()
@@ -46,14 +45,6 @@ class Ronda:
         else:
             self.resultado["jugador_con_mas_suerte"] = "No determinado"
         return self.resultado
-
-    def _preparar_jugadores(self):
-        """
-        Prepara a los jugadores para la ronda, restaurando su resistencia original
-        menos una o dos unidades para representar el cansancio acumulado.
-        """
-        for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
-            jugador.tiros_realizados = 0
 
     def _jugar_turnos_equipos(self):
         self._jugar_turno_equipo(self.equipo1, "equipo 1")
@@ -230,7 +221,7 @@ class Ronda:
     def _aumentar_experiencia(self, equipo):
         for jugador in equipo.jugadores:
             jugador.experiencia += 3
-            if jugador.experiencia >= 9:
+            if jugador.experiencia >= 19:
                 jugador.beneficio_resistencia = True
 
     def _recuperar_resistencia(self):

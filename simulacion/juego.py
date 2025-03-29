@@ -26,7 +26,7 @@ class Juego:
         self.historial_rondas.append(resultado)
         # self._mostrar_resultados_ronda(resultado)
 
-    def jugar_partida_completa(self):
+    def jugar_juego_completo(self):
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
             jugador.resetear_jugador()
             jugador.guardar_puntaje_total()
@@ -72,7 +72,7 @@ class Juego:
         self.equipo2.puntaje_juego = 0
 
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
-            jugador.consecutivo_extra_ganados = 0
+           jugador.finalizar_juego() 
 
     def resultado_puntos_por_jugador(self):
         puntos_por_jugador = {}
@@ -83,7 +83,6 @@ class Juego:
             puntos_por_jugador[jugador.nombre] = jugador.puntaje_juego_actual
 
         print(puntos_por_jugador)
-        return puntos_por_jugador
     
     def determinar_jugador_con_mas_suerte(self):
         # se busca en cada ronda el jugador con más suerte

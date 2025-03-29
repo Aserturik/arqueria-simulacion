@@ -37,7 +37,7 @@ class Jugador:
     def reiniciar_habilidades(self):
         """Restaura las habilidades a sus valores iniciales"""
         self.resistencia = self.resistencia_inicial - self.cansancio_acumulado
-        #self.experiencia = self.experiencia_inicial
+        self.experiencia = self.experiencia_inicial
 
         # También se actualizan las propiedades relacionadas con la ronda
         self.resistencia_actual = self.resistencia
@@ -53,6 +53,8 @@ class Jugador:
         """Al final del juego, recupera su resistencia original"""
         self.reiniciar_habilidades()
         self.cansancio_acumulado = 0
+        self.tiros_realizados = 0
+        self.consecutivo_extra_ganados = 0
 
     def puede_tirar(self):
         """Verifica si el jugador tiene suficiente resistencia para realizar un tiro"""
