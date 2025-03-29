@@ -37,12 +37,17 @@ class Jugador:
     def reiniciar_habilidades(self):
         """Restaura las habilidades a sus valores iniciales"""
         self.resistencia = self.resistencia_inicial - self.cansancio_acumulado
-        self.experiencia = self.experiencia_inicial
+        #self.experiencia = self.experiencia_inicial
 
         # También se actualizan las propiedades relacionadas con la ronda
         self.resistencia_actual = self.resistencia
         self.consecutivo_extra_ganados = 0
         self.beneficio_resistencia = False
+
+    def resetear_jugador(self):
+        self.resistencia = self.resistencia_inicial
+        self.experiencia = self.experiencia_inicial
+        self.cansancio_acumulado = 0
 
     def finalizar_juego(self):
         """Al final del juego, recupera su resistencia original"""

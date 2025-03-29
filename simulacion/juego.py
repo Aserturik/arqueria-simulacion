@@ -28,6 +28,7 @@ class Juego:
 
     def jugar_partida_completa(self):
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
+            jugador.resetear_jugador()
             jugador.guardar_puntaje_total()
 
         for _ in range(self.num_rondas):
@@ -71,7 +72,6 @@ class Juego:
         self.equipo2.puntaje_juego = 0
 
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
-            jugador.reiniciar_habilidades()
             jugador.consecutivo_extra_ganados = 0
 
     def resultado_puntos_por_jugador(self):
