@@ -48,7 +48,6 @@ arqueria-simulacion/
 ├── simulacion.py             # Script principal de simulación
 └── resultados_acumulados.json # Datos de resultados guardados
 ```
-```
 
 ## Instalación y Ejecución
 
@@ -80,12 +79,12 @@ pip install flask matplotlib numpy names
 python index.py
 ```
 
-La aplicación estará disponible en http://127.0.0.1:5000/
+La aplicación estará disponible en http://localhost:5000/
 
 ## Cómo funciona
 
 - Al iniciar el juego, se crean dos equipos con 5 jugadores cada uno
-- Se simulan 50 juegos consecutivos, cada uno con 10 rondas
+- Se simulan 20000 juegos consecutivos, cada uno con 10 rondas
 - Los jugadores realizan tiros al blanco, obteniendo puntos según su precisión
 - El sistema registra estadísticas como rondas ganadas, puntajes y el jugador con más suerte
 - Al finalizar, se muestran los resultados en tablas y gráficos
