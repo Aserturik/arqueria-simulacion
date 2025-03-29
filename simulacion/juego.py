@@ -36,7 +36,7 @@ class Juego:
 
         self.resultado_puntos_por_jugador()
         self.determinar_jugador_con_mas_suerte()
-        #self.determinar_jugador_con_mas_experiencia()
+        self.determinar_jugador_con_mas_experiencia()
         self._finalizar_juego()
 
     def _mostrar_resultados_ronda(self, resultado):
@@ -124,18 +124,22 @@ class Juego:
             self.jugador_con_mas_suerte = "No determinado"
 
     def determinar_jugador_con_mas_experiencia(self):
+        # similar a determinar_jugador_con_mas_suerte
         # se busca en cada ronda el jugador con más experiencia
         # el atributo "jugador_con_mas_experiencia" de la ronda
         # el jugador que más veces aparezca como jugador con más experiencia
         # es el jugador con más experiencia del juego
         jugadores_experiencia = {}
         for ronda in self.historial_rondas:
-            jugador_id = ronda["jugador_con_mas_experiencia"]["user_id"]
+            # Verificar que no sea "No determinado" y sea un diccionario
+            if isinstance(ronda["jugador_con_mas_experiencia"], dict):
+                jugador_id = ronda["jugador_con_mas_experiencia"]["user_id"]
 
-            if jugador_id not in jugadores_experiencia:
-                jugadores_experiencia[jugador_id] = 1
-            else:
-                jugadores_experiencia[jugador_id] += 1
+                if jugador_id not in jugadores_experiencia:
+                    jugadores_experiencia[jugador_id] = 1
+                else:
+                    jugadores_experiencia[jugador_id] += 1
+
         # se busca el jugador con más experiencia
         if jugadores_experiencia:
             jugador_id_mas_experiencia = max(

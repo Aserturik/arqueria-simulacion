@@ -57,7 +57,7 @@ class Ronda:
             self.resultado["jugador_con_mas_suerte"] = "No determinado"
 
         if self.jugador_con_mas_experiencia:
-           self.resultado["jugador_con_mas_experiencia"] = {
+            self.resultado["jugador_con_mas_experiencia"] = {
                 "nombre": self.jugador_con_mas_experiencia.nombre,
                 "user_id": self.jugador_con_mas_experiencia.user_id,
                 "experiencia": self.jugador_con_mas_experiencia.experiencia,
@@ -66,7 +66,7 @@ class Ronda:
                     if self.jugador_con_mas_experiencia in self.equipo1.jugadores
                     else "equipo 2"
                 ),
-            } 
+            }
         else:
             self.resultado["jugador_con_mas_experiencia"] = "No determinado"
         return self.resultado
@@ -238,10 +238,21 @@ class Ronda:
             jugador_extra.consecutivo_extra_ganados += 1
 
     def _actualizar_experiencia(self):
-        if self.resultado["ganador_individual"] == self.equipo1.nombre:
-            self._aumentar_experiencia(self.equipo1)
-        elif self.resultado["ganador_individual"] == self.equipo2.nombre:
-            self._aumentar_experiencia(self.equipo2)
+        """
+        Actualiza la experiencia de los jugadores y determina el jugador con más experiencia.
+        """
+
+        self._aumentar_experiencia(self.equipo1)
+        self._aumentar_experiencia(self.equipo2)
+
+        # Encontrar el jugador con más experiencia entre todos los jugadores
+        todos_los_jugadores = self.equipo1.jugadores + self.equipo2.jugadores
+        if todos_los_jugadores:
+            self.jugador_con_mas_experiencia = max(
+                todos_los_jugadores, key=lambda j: j.experiencia
+            )
+        else:
+            self.jugador_con_mas_experiencia = None
 
     def _aumentar_experiencia(self, equipo):
         for jugador in equipo.jugadores:
