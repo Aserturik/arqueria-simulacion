@@ -61,6 +61,7 @@ class Ronda:
 
     def _jugar_turno_equipo(self, equipo, clave_equipo):
         for jugador in equipo.jugadores:
+            jugador.reiniciar_suerte()
             puntaje, tiros = 0, 0
             while jugador.puede_tirar():
                 puntaje += self.blanco.realizar_tiro(jugador)
@@ -74,6 +75,8 @@ class Ronda:
         # el jugador con más suerte de cada equipo lanza un tiro extra
         for equipo, clave in [(self.equipo1, "equipo 1"), (self.equipo2, "equipo 2")]:
             jugador = max(equipo.jugadores, key=lambda j: j.suerte)
+            print(jugador.nombre, "con mas suerte")
+            print("valor de suerte ",jugador.suerte)
             self.jugador_con_mas_suerte = jugador.nombre
             tiro = self.blanco.realizar_tiro(jugador)
             self.resultado[clave]["puntaje"] += tiro

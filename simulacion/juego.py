@@ -71,7 +71,7 @@ class Juego:
         self.equipo2.puntaje_juego = 0
 
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
-            jugador.resistencia_actual = jugador.resistencia_inicial
+            jugador.reiniciar_habilidades()
             jugador.consecutivo_extra_ganados = 0
 
     def resultado_puntos_por_jugador(self):

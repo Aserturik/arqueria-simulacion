@@ -9,6 +9,7 @@ class Jugador:
         self.genero = genero  # 'M' o 'F'
         self._generar_habilidades()
         self.rondas_ganadas = 0
+        self.suerte = 0
         self.puntaje_total = 0
         self.puntaje_juego_anterior = 0
         self.puntaje_juego_actual = 0
@@ -19,7 +20,6 @@ class Jugador:
         # Relaciones requeridas por la lógica de Ronda
         self.resistencia_actual = self.resistencia  # Valor actual de resistencia
         self.consecutivo_extra_ganados = 0  # Conteo de tiros extra consecutivos ganados
-        self.punteria = random.randint(50, 100)  # Valor de puntería para desempates
         self.beneficio_resistencia = (
             False  # Beneficio que puede mejorar la recuperación
         )
@@ -33,13 +33,11 @@ class Jugador:
         # Asignamos los valores actuales
         self.resistencia = self.resistencia_inicial
         self.experiencia = self.experiencia_inicial
-        self.suerte = self.reiniciar_suerte()
 
     def reiniciar_habilidades(self):
         """Restaura las habilidades a sus valores iniciales"""
         self.resistencia = self.resistencia_inicial - self.cansancio_acumulado
         self.experiencia = self.experiencia_inicial
-        self.suerte = self.suerte_inicial
 
         # También se actualizan las propiedades relacionadas con la ronda
         self.resistencia_actual = self.resistencia
@@ -88,7 +86,7 @@ class Jugador:
 
     def reiniciar_suerte(self):
         """Reinicia la suerte del jugador para cada ronda"""
-        return round(random.uniform(1.0, 3.0), 2)
+        self.suerte = round(random.uniform(1.0, 3.0), 2)
 
     def guardar_puntaje_total(self):
         """Guarda el puntaje total acumulado del jugador"""
