@@ -8,6 +8,7 @@ class Ronda:
         self.equipo2 = equipo2
         self.blanco = blanco
         self.jugador_ganador = None
+        self.jugador_con_mas_suerte = None
         self.resultado = {
             "ronda actual": numero_ronda,
             "equipo 1": {
@@ -26,6 +27,7 @@ class Ronda:
             },
             "ganador_individual": None,
             "ganador_grupal": None,
+            "jugador_con_mas_suerte": self.jugador_con_mas_suerte,
             "ronda": numero_ronda,
         }
 
@@ -38,7 +40,11 @@ class Ronda:
         self._determinar_equipo_ganador()
         self._actualizar_experiencia()
         self._recuperar_resistencia()
-        # self._registrar_tiros_jugadores()
+
+        if self.jugador_con_mas_suerte:
+            self.resultado["jugador_con_mas_suerte"] = self.jugador_con_mas_suerte
+        else:
+            self.resultado["jugador_con_mas_suerte"] = "No determinado"
         return self.resultado
 
     def _preparar_jugadores(self):
@@ -68,6 +74,7 @@ class Ronda:
         # el jugador con más suerte de cada equipo lanza un tiro extra
         for equipo, clave in [(self.equipo1, "equipo 1"), (self.equipo2, "equipo 2")]:
             jugador = max(equipo.jugadores, key=lambda j: j.suerte)
+            self.jugador_con_mas_suerte = jugador.nombre
             tiro = self.blanco.realizar_tiro(jugador)
             self.resultado[clave]["puntaje"] += tiro
 

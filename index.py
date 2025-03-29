@@ -45,9 +45,9 @@ def jugar():
         juego = Juego(equipo_1, equipo_2, num_rondas=10, juego_actual=i + 1)
         juego.jugar_partida_completa()
 
-        # Guardar los resultados básicos (sin incluir todo el historial de rondas)
-        resultado_basico = {
+        resultado_juegos = {
             "id_juego": juego.id_juego,
+            "jugador_con_mas_suerte": juego.jugador_con_mas_suerte,
             "numero_juego": juego.juego_actual,
             "equipo_1": {
                 "nombre": juego.equipo1.nombre,
@@ -80,7 +80,7 @@ def jugar():
 
             # Escribir cada resultado individual al archivo con coma solo si no es el último
         with open("resultados_acumulados.json", "a") as f:
-            f.write(json.dumps(convert_numpy(resultado_basico), indent=2))
+            f.write(json.dumps(convert_numpy(resultado_juegos), indent=2))
             if i < total_juegos - 1:
                 f.write(",\n")
             else:

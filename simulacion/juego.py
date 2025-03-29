@@ -34,6 +34,7 @@ class Juego:
             self.jugar_ronda()
 
         self.resultado_puntos_por_jugador()
+        self.determinar_jugador_con_mas_suerte()
         self._finalizar_juego()
 
     def _mostrar_resultados_ronda(self, resultado):
@@ -83,3 +84,23 @@ class Juego:
 
         print(puntos_por_jugador)
         return puntos_por_jugador
+    
+    def determinar_jugador_con_mas_suerte(self):
+        # se busca en cada ronda el jugador con más suerte
+        # el atributo "jugador_con_mas_suerte" de la ronda
+        # el jugador que más veces aparezca como jugador con más suerte
+        # es el jugador con más suerte del juego
+        jugadores_suerte = {}
+        for ronda in self.historial_rondas:
+            jugador = ronda["jugador_con_mas_suerte"]
+            if jugador not in jugadores_suerte:
+                jugadores_suerte[jugador] = 1
+            else:
+                jugadores_suerte[jugador] += 1
+        # se busca el jugador con más suerte
+        if jugadores_suerte:
+            jugador_con_mas_suerte = max(jugadores_suerte, key=jugadores_suerte.get)
+            self.jugador_con_mas_suerte = jugador_con_mas_suerte
+        else:
+            self.jugador_con_mas_suerte = "No determinado"
+            
