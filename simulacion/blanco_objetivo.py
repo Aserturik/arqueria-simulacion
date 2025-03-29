@@ -50,6 +50,7 @@ class Blanco:
         # Actualizar estado del jugador
         jugador.resistencia_actual -= self.TIRO_RESISTENCIA_COST
         jugador.tiros_realizados += 1
+        jugador.reiniciar_suerte()
 
         # Calcular probabilidades ajustadas
         probs = self._ajustar_probabilidades(jugador)

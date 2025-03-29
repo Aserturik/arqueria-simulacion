@@ -28,8 +28,8 @@ def index():
 
 @app.route("/jugar", methods=["POST"])
 def jugar():
-    equipo_1 = Equipo("Arqueros del norte", "M", 5)
-    equipo_2 = Equipo("Arqueras del sur", "F", 5)
+    equipo_1 = Equipo("Lo tiguere", 5)
+    equipo_2 = Equipo("Los jaguares", 5)
 
     # Para resultados acumulados, creamos o limpiamos el archivo al inicio
     with open("resultados_acumulados.json", "w") as f:
@@ -78,7 +78,7 @@ def jugar():
                 "historial_rondas": juego.historial_rondas,
             }
 
-        # Escribir cada resultado individual al archivo con coma solo si no es el último
+            # Escribir cada resultado individual al archivo con coma solo si no es el último
         with open("resultados_acumulados.json", "a") as f:
             f.write(json.dumps(convert_numpy(resultado_basico), indent=2))
             if i < total_juegos - 1:
@@ -92,6 +92,9 @@ def jugar():
         f"{juego.equipo1.nombre}: {juego.equipo1.rondas_ganadas} rondas vs "
         f"{juego.equipo2.nombre}: {juego.equipo2.rondas_ganadas} rondas."
     )
+    # Mostrar los equipos y sus integrantes con equipos.mostrar_jugadores()
+    equipo_1.mostrar_jugadores()
+    equipo_2.mostrar_jugadores()
 
     return render_template(
         "resultados.html",

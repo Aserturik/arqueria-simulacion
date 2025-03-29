@@ -28,12 +28,11 @@ class Jugador:
         # resistencia: 35 ± 10
         self.resistencia_inicial = random.randint(25, 45)  # 35 ± 10
         self.experiencia_inicial = 10
-        self.suerte_inicial = round(random.uniform(1.0, 3.0), 2)
 
         # Asignamos los valores actuales
         self.resistencia = self.resistencia_inicial
         self.experiencia = self.experiencia_inicial
-        self.suerte = self.suerte_inicial
+        self.suerte = self.reiniciar_suerte()
 
     def reiniciar_habilidades(self):
         """Restaura las habilidades a sus valores iniciales"""
@@ -85,8 +84,11 @@ class Jugador:
             return True
         else:
             return False
-        
+
+    def reiniciar_suerte(self):
+        """Reinicia la suerte del jugador para cada ronda"""
+        return round(random.uniform(1.0, 3.0), 2)
+
     def guardar_puntaje_total(self):
         """Guarda el puntaje total acumulado del jugador"""
         self.puntaje_juego_anterior = self.puntaje_total
-        

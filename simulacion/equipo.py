@@ -3,13 +3,16 @@ import random
 import names
 import uuid
 
+
 class Equipo:
-    def __init__(self, nombre, genero, num_jugadores=5):
-        self.equipo_id = str(uuid.uuid4()) 
+    def __init__(self, nombre, num_jugadores=5):
+        self.equipo_id = str(uuid.uuid4())
         self.nombre = nombre
+        """
         self.genero = genero.upper()  # 'M' o 'F'
         if self.genero not in ["M", "F"]:
             raise ValueError("El género debe ser 'M' o 'F'")
+        """
         self.jugadores = self._generar_jugadores(num_jugadores)
         self.rondas_ganadas = 0
         self.puntaje_total = 0
@@ -17,13 +20,36 @@ class Equipo:
         self.jugadores_por_id = {jugador.user_id: jugador for jugador in self.jugadores}
 
     def _generar_jugadores(self, num_jugadores):
-        jugadores = []
-        for _ in range(num_jugadores):
-            nombre = names.get_full_name(
-                gender="male" if self.genero == "M" else "female"
+        if num_jugadores < 2:
+            raise ValueError(
+                "El equipo debe tener al menos 2 jugadores para garantizar diversidad de género"
             )
-            jugadores.append(Jugador(nombre, self.genero))
+
+        jugadores = []
+        # Asegurar al menos un jugador de cada género
+        nombre_m = names.get_full_name(gender="male")
+        jugadores.append(Jugador(nombre_m, "M"))
+
+        nombre_f = names.get_full_name(gender="female")
+        jugadores.append(Jugador(nombre_f, "F"))
+
+        # Para el resto de jugadores, asignar género aleatoriamente
+        for _ in range(num_jugadores - 2):
+            genero = random.choice(["M", "F"])
+            nombre = names.get_full_name(gender="male" if genero == "M" else "female")
+            jugadores.append(Jugador(nombre, genero))
+
+        # Mezclar la lista para que el orden sea aleatorio
+        random.shuffle(jugadores)
         return jugadores
+
+    def mostrar_jugadores(self):
+        """Muestra los jugadores del equipo con su genero"""
+        print(
+            f"Jugadores del equipo {self.nombre} (ID: {self.equipo_id}):"
+        )
+        for jugador in self.jugadores:
+            print(f"- {jugador.nombre} (ID: {jugador.user_id}) (GENERO: {jugador.genero})")
 
     def realizar_ronda(self):
         puntaje_ronda = 0
