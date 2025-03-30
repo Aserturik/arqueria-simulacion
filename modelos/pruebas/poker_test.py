@@ -19,15 +19,16 @@ from typing import List, Optional
 class PokerTest:
 
     def __init__(self, ri_nums):
-        self.ri_nums = ri_nums              # Lista de números pseudoaleatorios en el rango [0, 1)
-        self.prob = [0.3024, 0.504, 0.108, 0.072, 0.009, 0.0045, 0.0001]  # Probabilidades teóricas de cada mano de poker
-        self.oi = [0, 0, 0, 0, 0, 0, 0]      # Frecuencias observadas de cada mano
-        self.ei = []                        # Frecuencias esperadas de cada mano (se calcularán según prob y n)
-        self.eid = []                       # Valores (oi - ei)^2 / ei para cada mano
-        self.passed = False                 # Resultado de la prueba (True si pasó, False si no)
-        self.n = len(ri_nums)               # Número de elementos en la secuencia de números pseudoaleatorios
-        self.total_sum = 0.0                # Suma total de los valores calculados (oi - ei)^2 / ei
-        self.chi_reverse = st.chi2.ppf(1 - 0.05, 6)  # Valor crítico de chi-cuadrado para 6 grados de libertad y nivel 0.05
+        self.ri_nums = ri_nums
+        # Probabilidades teóricas para 5 dígitos
+        self.prob = [0.3024, 0.504, 0.108, 0.072, 0.009, 0.0045, 0.0001]
+        self.oi = [0, 0, 0, 0, 0, 0, 0]
+        self.ei = []
+        self.eid = []
+        self.passed = False
+        self.n = len(ri_nums)
+        self.total_sum = 0.0
+        self.chi_reverse = st.chi2.ppf(1 - 0.05, 6)
 
     # Realiza la prueba de poker y determina si ha pasado.
     def check_poker(self):
@@ -49,24 +50,24 @@ class PokerTest:
     # Calcula las frecuencias observadas de cada mano de poker.
     def calculate_oi(self):
         for n in self.ri_nums:
-            # Convertir el número a cadena y separar en la parte decimal.
-            arr = str(n).split(".")
-            if len(arr) < 2:
+            # Convertir el número a cadena con exactamente 5 dígitos decimales
+            num = format(n, '.5f').split('.')[1]
+            if len(num) != 5:  # Asegurarse de que tengamos exactamente 5 dígitos
                 continue
-            num = arr[1]
-            if self.all_diff(num):  # Todas diferentes
+                
+            if self.all_diff(num):
                 self.oi[0] += 1
-            elif self.all_same(num):  # Todas iguales
+            elif self.all_same(num):
                 self.oi[6] += 1
-            elif self.four_of_a_kind(num):  # Cuatro del mismo valor
+            elif self.four_of_a_kind(num):
                 self.oi[5] += 1
-            elif self.one_three_of_a_kind_and_one_pair(num):  # Tercia y un par (Full house)
+            elif self.one_three_of_a_kind_and_one_pair(num):
                 self.oi[4] += 1
-            elif self.only_three_of_a_kind(num):  # Solo una tercia
+            elif self.only_three_of_a_kind(num):
                 self.oi[3] += 1
-            elif self.two_pairs(num):  # Dos pares
+            elif self.two_pairs(num):
                 self.oi[2] += 1
-            elif self.only_one_pair(num):  # Solo un par
+            elif self.only_one_pair(num):
                 self.oi[1] += 1
 
     def all_diff(self, numstr):
