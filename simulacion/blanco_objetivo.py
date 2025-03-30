@@ -5,6 +5,14 @@ from modelos.random_wrapper import uniform, choices
 
 @dataclass
 class Lanzamiento:
+    """
+    Estructura de datos que representa un lanzamiento individual.
+    
+    Attributes:
+        coordenadas (List[float]): Coordenadas [x, y] donde impactó el tiro
+        zona (int): Identificador numérico de la zona impactada
+        puntaje (int): Puntuación obtenida por el tiro
+    """
     coordenadas: List[float]
     zona: int
     puntaje: int
@@ -12,6 +20,15 @@ class Lanzamiento:
 
 @dataclass
 class JugadorTiros:
+    """
+    Estructura de datos que agrupa los tiros de un jugador.
+    
+    Attributes:
+        jugador_id (str): Identificador único del jugador
+        nombre (str): Nombre del jugador
+        genero (str): Género del jugador ('M' o 'F')
+        lanzamientos (List[Lanzamiento]): Lista de todos los tiros realizados
+    """
     jugador_id: str
     nombre: str
     genero: str
@@ -19,6 +36,17 @@ class JugadorTiros:
 
 
 class Blanco:
+    """
+    Representa el blanco de tiro con arco y maneja la lógica de puntuación.
+    Implementa un sistema de zonas concéntricas con diferentes puntajes y 
+    probabilidades basadas en el género y habilidades del tirador.
+    
+    Attributes:
+        ZONAS (dict): Mapeo de zonas a puntajes
+        RADIO_* (float): Radios de las diferentes zonas del blanco
+        PROBABILIDADES (dict): Probabilidades base de acierto por género y zona
+    """
+
     # Mapeo zona -> puntaje (nombre a valor numérico)
     ZONAS = {"CENTRAL": 10, "INTERMEDIA": 9, "EXTERIOR": 8, "ERROR": 0}
 
@@ -41,7 +69,20 @@ class Blanco:
         self.players: Dict[str, JugadorTiros] = {}  # JugadorID -> Datos
 
     def realizar_tiro(self, jugador) -> int:
-        """Realiza un tiro y devuelve el puntaje obtenido"""
+        """
+        Procesa un intento de tiro y calcula su resultado.
+
+        Args:
+            jugador (Jugador): El jugador que realiza el tiro
+
+        Returns:
+            int: Puntaje obtenido en el tiro
+
+        Efectos:
+            - Reduce la resistencia del jugador
+            - Incrementa el contador de tiros
+            - Registra el tiro en el historial del jugador
+        """
         # Verificar resistencia
         # if jugador.resistencia_actual < self.TIRO_RESISTENCIA_COST:
         #    return self.ZONAS["ERROR"]
@@ -66,6 +107,19 @@ class Blanco:
         return puntaje
 
     def realizar_tiro_desempate(self, jugador):
+        """
+        Realiza un tiro especial para desempate sin afectar la resistencia.
+
+        Args:
+            jugador (Jugador): El jugador que realiza el tiro de desempate
+
+        Returns:
+            int: Puntaje obtenido en el tiro
+
+        Efectos:
+            - Reinicia la suerte del jugador
+            - Registra el tiro en el historial
+        """
         # igual que el realizar tiro pero sin restar resistencia
         jugador.reiniciar_suerte()
 
@@ -83,7 +137,16 @@ class Blanco:
         return puntaje
 
     def _registrar_nuevo_jugador(self, jugador):
-        """Crea una nueva entrada para un jugador"""
+        """
+        Crea un nuevo registro para un jugador en el sistema.
+
+        Args:
+            jugador (Jugador): El jugador a registrar
+
+        Efectos:
+            - Crea una nueva entrada en self.players para el jugador
+            - Inicializa su lista de lanzamientos
+        """
         self.players[jugador.user_id] = JugadorTiros(
             jugador_id=jugador.user_id,
             nombre=jugador.nombre,
@@ -92,7 +155,21 @@ class Blanco:
         )
 
     def _ajustar_probabilidades(self, jugador) -> Dict[str, float]:
-        """Ajusta las probabilidades según habilidades del jugador"""
+        """
+        Ajusta las probabilidades de acierto según las habilidades del jugador.
+
+        Args:
+            jugador (Jugador): El jugador cuyas probabilidades se ajustarán
+
+        Returns:
+            Dict[str, float]: Probabilidades ajustadas para cada zona
+
+        Proceso:
+            1. Copia las probabilidades base según el género
+            2. Aumenta prob. de CENTRAL según la suerte
+            3. Reduce prob. de ERROR según la experiencia
+            4. Normaliza las probabilidades
+        """
         probs = self.PROBABILIDADES[jugador.genero].copy()
 
         # Aumentar probabilidad de CENTRAL por suerte
@@ -108,7 +185,22 @@ class Blanco:
         return {zona: prob / total for zona, prob in probs.items()}
 
     def _generar_tiro(self, probs: Dict[str, float]) -> tuple:
-        """Genera coordenadas del tiro usando nuestro generador validado"""
+        """
+        Genera las coordenadas y zona de impacto de un tiro.
+
+        Args:
+            probs (Dict[str, float]): Probabilidades ajustadas para cada zona
+
+        Returns:
+            tuple: (zona, [x, y]) donde zona es el identificador de la zona impactada
+                  y [x, y] son las coordenadas del impacto
+
+        Proceso:
+            1. Selecciona la zona de impacto según las probabilidades
+            2. Calcula el radio según la zona
+            3. Genera coordenadas polares aleatorias
+            4. Convierte a coordenadas cartesianas
+        """
         # Seleccionar zona
         zona = choices(
             population=list(probs.keys()), 
@@ -137,9 +229,20 @@ class Blanco:
         return zona, [x, y]
 
     def obtener_tiros_serializables(self) -> List[dict]:
-        """Devuelve los datos en formato JSON optimizado"""
+        """
+        Convierte el historial de tiros a formato serializable.
+
+        Returns:
+            List[dict]: Lista de diccionarios con los datos de tiros
+                       de cada jugador en formato JSON
+        """
         return [asdict(player) for player in self.players.values()]
 
     def reset(self):
-        """Reinicia todos los registros"""
+        """
+        Reinicia el historial de tiros del blanco.
+
+        Efectos:
+            - Elimina todos los registros de tiros anteriores
+        """
         self.players.clear()

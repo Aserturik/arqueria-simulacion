@@ -2,7 +2,27 @@ from modelos.random_wrapper import randint
 
 
 class Ronda:
+    """
+    Representa una ronda del juego de arquería donde dos equipos compiten.
+    Maneja la lógica de los turnos, puntajes y determina los ganadores de la ronda.
+    """
+
     def __init__(self, numero_ronda, equipo1, equipo2, blanco):
+        """
+        Inicializa una nueva ronda del juego.
+
+        Args:
+            numero_ronda (int): Número identificador de la ronda actual
+            equipo1 (Equipo): Primer equipo participante
+            equipo2 (Equipo): Segundo equipo participante
+            blanco (Blanco): El blanco objetivo donde se realizarán los tiros
+
+        Atributos:
+            jugador_ganador: El jugador que obtuvo el mayor puntaje en la ronda
+            jugador_con_mas_suerte: El jugador que tuvo la mayor suerte en la ronda
+            jugador_con_mas_experiencia: El jugador con mayor experiencia acumulada
+            resultado (dict): Diccionario que almacena todos los resultados de la ronda
+        """
         self.numero_ronda = numero_ronda
         self.equipo1 = equipo1
         self.equipo2 = equipo2
@@ -34,6 +54,20 @@ class Ronda:
         }
 
     def jugar(self):
+        """
+        Ejecuta la secuencia completa de una ronda de juego.
+        
+        Secuencia:
+        1. Los equipos juegan sus turnos
+        2. Se realiza el tiro extra para el jugador con más suerte
+        3. Se determina el jugador ganador
+        4. Se determina el equipo ganador
+        5. Se actualiza la experiencia de los jugadores
+        6. Se actualiza la resistencia de los jugadores
+
+        Returns:
+            dict: Resultados completos de la ronda, incluyendo puntajes, ganadores y estadísticas
+        """
         self._jugar_turnos_equipos()
         self._jugar_tiro_extra()
         self._determinar_jugador_ganador()
@@ -72,10 +106,26 @@ class Ronda:
         return self.resultado
 
     def _jugar_turnos_equipos(self):
+        """
+        Gestiona los turnos de tiro de ambos equipos.
+        Cada equipo realiza sus tiros en orden.
+        """
         self._jugar_turno_equipo(self.equipo1, "equipo 1")
         self._jugar_turno_equipo(self.equipo2, "equipo 2")
 
     def _jugar_turno_equipo(self, equipo, clave_equipo):
+        """
+        Ejecuta el turno de tiro para un equipo específico.
+
+        Args:
+            equipo (Equipo): El equipo que realizará los tiros
+            clave_equipo (str): Identificador del equipo ("equipo 1" o "equipo 2")
+            
+        Efectos:
+            - Cada jugador del equipo realiza tiros mientras tenga suficiente resistencia
+            - Se actualizan los puntajes y estadísticas del equipo en el resultado
+            - Se reinicia la suerte de cada jugador antes de sus tiros
+        """
         for jugador in equipo.jugadores:
             jugador.reiniciar_suerte()
             puntaje, tiros = 0, 0
@@ -88,6 +138,14 @@ class Ronda:
             jugador.puntaje_ronda_actual = puntaje
 
     def _jugar_tiro_extra(self):
+        """
+        Ejecuta los tiros extra para los jugadores con más suerte de cada equipo.
+        
+        Efectos:
+            - Identifica al jugador con más suerte de cada equipo
+            - Les permite realizar un tiro adicional
+            - Actualiza el puntaje del equipo con el resultado del tiro extra
+        """
         # el jugador con más suerte de cada equipo lanza un tiro extra
         for equipo, clave in [(self.equipo1, "equipo 1"), (self.equipo2, "equipo 2")]:
             jugador = max(equipo.jugadores, key=lambda j: j.suerte)
@@ -134,6 +192,14 @@ class Ronda:
                 jugador.consecutivo_extra_ganados = 0
 
     def _determinar_equipo_ganador(self):
+        """
+        Determina qué equipo ganó la ronda basado en el puntaje total.
+        
+        Efectos:
+            - Compara los puntajes totales de ambos equipos
+            - Asigna el ganador o declara empate
+            - Actualiza el resultado de la ronda con el equipo ganador
+        """
         puntaje1 = self.resultado["equipo 1"]["puntaje"]
         puntaje2 = self.resultado["equipo 2"]["puntaje"]
 
@@ -149,19 +215,15 @@ class Ronda:
         """
         Determina el jugador ganador de la ronda actual.
 
-        Evalúa los puntajes de todos los jugadores de ambos equipos y selecciona al que
-        tiene el puntaje más alto como ganador. En caso de empate en los puntajes más altos,
-        se realizan lanzamientos adicionales (desempate) hasta que se determine un único ganador.
-
         Proceso:
-        1. Encuentra el puntaje máximo entre todos los jugadores.
-        2. Identifica todos los jugadores que tienen ese puntaje.
-        3. Si solo hay un jugador con el puntaje máximo, es declarado ganador.
-        4. Si hay múltiples jugadores empatados, inicia un proceso de desempate con lanzamientos
-           adicionales hasta que solo quede un ganador.
+        1. Encuentra el puntaje máximo entre todos los jugadores
+        2. Identifica a todos los jugadores que tienen ese puntaje máximo
+        3. Si hay un solo jugador con el puntaje máximo, es declarado ganador
+        4. Si hay múltiples jugadores con el mismo puntaje máximo, se inicia un desempate
 
-        Resultado:
-        - Actualiza el atributo `jugador_ganador` con el jugador que ganó la ronda.
+        Efectos:
+            - Actualiza el atributo jugador_ganador con el jugador que ganó la ronda
+            - En caso de empate, inicia el proceso de desempate
         """
         maximo = 0
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
@@ -184,17 +246,18 @@ class Ronda:
 
     def _desempate(self, jugadores_empatados):
         """
-        Realiza un desempate entre jugadores empatados en puntaje.
-
-        Todos los jugadores empatados realizan un tiro adicional. Solo los jugadores con
-        el puntaje más alto en este tiro continúan en la siguiente ronda de desempate.
-        El proceso se repite hasta que quede un solo ganador.
+        Realiza un proceso de desempate entre jugadores con el mismo puntaje máximo.
 
         Args:
-          jugadores_empatados (list): Lista de jugadores con el mismo puntaje máximo
+            jugadores_empatados (list): Lista de jugadores que empataron con el puntaje más alto
 
         Returns:
-          Jugador: El jugador ganador tras el desempate
+            Jugador: El jugador que ganó el desempate
+
+        Proceso:
+            1. Todos los jugadores empatados realizan un tiro adicional
+            2. Solo los que obtienen el puntaje más alto continúan
+            3. El proceso se repite hasta que quede un solo ganador
         """
         contendientes = jugadores_empatados.copy()
 
@@ -238,7 +301,14 @@ class Ronda:
             jugador_extra.consecutivo_extra_ganados += 1
 
     def _actualizar_experiencia(self):
-        """Actualiza la experiencia solo del jugador ganador de la ronda."""
+        """
+        Actualiza la experiencia de los jugadores después de la ronda.
+        
+        Efectos:
+            - El jugador ganador recibe 3 puntos de experiencia
+            - Si un jugador alcanza 19 puntos de experiencia, obtiene beneficio de resistencia
+            - Identifica y actualiza el jugador con más experiencia del juego
+        """
         # Solo el jugador ganador obtiene 3 puntos de experiencia
         if self.jugador_ganador:
             self.jugador_ganador.experiencia += 3
@@ -258,6 +328,14 @@ class Ronda:
             self.jugador_con_mas_experiencia = None
 
     def _recuperar_resistencia(self):
+        """
+        Gestiona la recuperación de resistencia de todos los jugadores al final de la ronda.
+        
+        Efectos:
+            - Incrementa el cansancio acumulado de cada jugador
+            - Actualiza los beneficios de resistencia si están activos
+            - Ajusta la resistencia actual según el cansancio y beneficios
+        """
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
             jugador.cansancio_acumulado += randint(1, 2)
 
