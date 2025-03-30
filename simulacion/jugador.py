@@ -1,4 +1,4 @@
-import uuid
+from uuid import uuid4  # Más específico que importar todo uuid
 from modelos.random_wrapper import randint, uniform
 
 
@@ -24,7 +24,7 @@ class Jugador:
             cansancio_acumulado (int): Pérdida de resistencia acumulada
             beneficio_resistencia (bool): Indica si el jugador tiene beneficio de resistencia
         """
-        self.user_id = str(uuid.uuid4())
+        self.user_id = str(uuid4())
         self.nombre = nombre
         self.genero = genero  # 'M' o 'F'
         self._generar_habilidades()

@@ -1,6 +1,6 @@
-import math
 from dataclasses import asdict, dataclass
 from typing import List, Dict
+import math  # Necesario para cálculos trigonométricos
 from modelos.random_wrapper import uniform, choices
 
 @dataclass

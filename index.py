@@ -11,7 +11,7 @@ from flask import (
 from utils.graficas import generar_grafica_puntos_jugadores_response
 from simulacion.juego import Juego
 from simulacion.equipo import Equipo
-import numpy as np
+from numpy import int64  # Solo importamos el tipo específico que necesitamos
 import json
 import threading
 import time
@@ -51,7 +51,7 @@ def convert_numpy(obj):
         return {k: convert_numpy(v) for k, v in obj.items()}
     elif isinstance(obj, list):
         return [convert_numpy(x) for x in obj]
-    elif isinstance(obj, np.int64):
+    elif isinstance(obj, int64):
         return int(obj)
     else:
         return obj

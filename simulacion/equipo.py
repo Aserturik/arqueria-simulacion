@@ -1,6 +1,6 @@
 from .jugador import Jugador
-import names
-import uuid
+import names  # Necesario para generar nombres aleatorios
+from uuid import uuid4  # Más específico que importar todo uuid
 from modelos.random_wrapper import choice, shuffle
 
 class Equipo:
@@ -25,7 +25,7 @@ class Equipo:
             puntaje_juego (int): Puntos acumulados en el juego actual
             juegos_ganados (int): Número total de juegos ganados
         """
-        self.equipo_id = str(uuid.uuid4())
+        self.equipo_id = str(uuid4())
         self.nombre = nombre
         self.jugadores = self._generar_jugadores(num_jugadores)
         self.rondas_ganadas = 0
