@@ -1,4 +1,13 @@
-from flask import Flask, render_template, redirect, url_for, session, send_file, jsonify, request
+from flask import (
+    Flask,
+    render_template,
+    redirect,
+    url_for,
+    session,
+    send_file,
+    jsonify,
+    request,
+)
 from simulacion.juego import Juego
 from simulacion.equipo import Equipo
 import numpy as np
@@ -14,6 +23,7 @@ equipo_2 = Equipo("Los jaguares", 5)
 todos_resultados = []  # Variable global para almacenar todos los resultados
 
 JSON_FILE = "simulacion_data.json"
+
 
 def convert_numpy(obj):
     if isinstance(obj, dict):
@@ -63,7 +73,7 @@ def jugar():
 
     total_juegos = 200
     global equipo_1, equipo_2, todos_resultados
-    
+
     # Reiniciar la lista de resultados
     todos_resultados = []
     ultimo_juego = None
@@ -97,6 +107,11 @@ def jugar():
                 and hasattr(juego.jugador_con_mas_experiencia, "nombre")
                 else "No determinado"
             ),
+            "genero_con_mas_victorias": juego.genero_con_mas_victorias,
+            "generos_victorias_totales": {
+                "M": juego.victorias_por_genero["M"],
+                "F": juego.victorias_por_genero["F"],
+            },
             "equipo_ganador": (
                 {
                     "nombre": juego.equipo_ganador_juego.nombre,
@@ -144,8 +159,8 @@ def resultados():
     global equipo_1, equipo_2, todos_resultados
 
     # Verificar si se solicita un juego específico
-    juego_id_solicitado = request.args.get('juego_id', None)
-    
+    juego_id_solicitado = request.args.get("juego_id", None)
+
     try:
         # Si no hay resultados en memoria, cargarlos del archivo
         if not todos_resultados:
@@ -162,7 +177,7 @@ def resultados():
         else:
             # Si no se solicita un juego específico, usar el último
             ultimo_juego = todos_resultados[-1] if todos_resultados else None
-            
+
         # Procesar el juego seleccionado
         if ultimo_juego:
             # Crear datos para pasar a la plantilla
@@ -178,7 +193,7 @@ def resultados():
                             "genero": jugador.genero,
                         }
                         for jugador in equipo_1.jugadores
-                    ]
+                    ],
                 },
                 "equipo2": {
                     "nombre": ultimo_juego["equipo_2"]["nombre"],
@@ -190,7 +205,7 @@ def resultados():
                             "genero": jugador.genero,
                         }
                         for jugador in equipo_2.jugadores
-                    ]
+                    ],
                 },
                 "historial_puntajes": [],  # No tenemos historial de rondas detallado
                 "jugador_con_mas_suerte": ultimo_juego["jugador_con_mas_suerte"],
@@ -253,8 +268,8 @@ def resultados():
 # Nueva ruta para buscar un juego específico por ID
 @app.route("/buscar_juego", methods=["GET"])
 def buscar_juego():
-    juego_id = request.args.get('id', '')
-    return redirect(url_for('resultados', juego_id=juego_id))
+    juego_id = request.args.get("id", "")
+    return redirect(url_for("resultados", juego_id=juego_id))
 
 
 @app.route("/resultados_acumulados.json")
@@ -266,10 +281,12 @@ def serve_json():
 def graficas():
     return render_template("graficas.html")
 
+
 @app.route("/todos_juegos", methods=["GET"])
 def todos_juegos():
     global todos_resultados
     return jsonify(todos_resultados)
+
 
 @app.route("/todos_juegos/<int:id>", methods=["GET"])
 def juego_por_id(id):
@@ -279,6 +296,7 @@ def juego_por_id(id):
         return jsonify(juego)
     else:
         return jsonify({"error": "Juego no encontrado"}), 404
+
 
 if __name__ == "__main__":
     app.run(debug=True)

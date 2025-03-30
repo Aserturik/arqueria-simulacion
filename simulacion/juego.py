@@ -4,6 +4,8 @@ from .ronda import Ronda
 
 
 class Juego:
+    generos_victorias_totales = {"M": 0, "F": 0}  # Contador de victorias por género
+
     def __init__(self, equipo1, equipo2, num_rondas=10, juego_actual=0):
         self.id_juego = str(uuid.uuid4())
         self.equipo1 = equipo1
@@ -22,6 +24,7 @@ class Juego:
         self.jugador_con_mas_experiencia = None
         self.equipo_ganador_juego = None
         self.genero_con_mas_victorias = None
+        self.victorias_por_genero = {"M": 0, "F": 0}
 
     def jugar_ronda(self):
         self.ronda_actual += 1
@@ -46,6 +49,7 @@ class Juego:
         self.equipo_ganador_del_juego()
         self.puntaje_equipo1_final = self.equipo1.puntaje_juego
         self.puntaje_equipo2_final = self.equipo2.puntaje_juego
+        self.determinar_genero_con_mas_victorias()
         self.guardar_estadisticas()
         self.reiniciar_equipos()
 
@@ -139,3 +143,44 @@ class Juego:
         else:
             self.jugador_con_mas_experiencia = "No determinado"
             self.experiencia_maxima = 10
+
+    def determinar_genero_con_mas_victorias(self):
+        """Determina el género que ganó más rondas en este juego específico."""
+        # Analizamos cada ronda para contar victorias por género
+        for ronda in self.historial_rondas:
+            if ronda["ganador_individual"] != "EMPATE" and ronda["ganador_individual"]:
+                # Identificar el equipo ganador
+                equipo_ganador = (
+                    self.equipo1
+                    if ronda["ganador_individual"] == self.equipo1.nombre
+                    else self.equipo2
+                )
+
+                # Encontrar al jugador con mayor puntaje de ese equipo en esa ronda
+                mejor_jugador = None
+                mejor_puntaje = -1
+
+                for jugador in equipo_ganador.jugadores:
+                    for j in self.equipo1.jugadores + self.equipo2.jugadores:
+                        if (
+                            j.nombre == jugador.nombre
+                            and j.puntaje_ronda_actual > mejor_puntaje
+                        ):
+                            mejor_puntaje = j.puntaje_ronda_actual
+                            mejor_jugador = j
+
+                # Sumar victoria al género correspondiente
+                if mejor_jugador:
+                    self.victorias_por_genero[mejor_jugador.genero] += 1
+
+        # Determinar el género con más victorias en este juego
+        if self.victorias_por_genero["M"] > self.victorias_por_genero["F"]:
+            self.genero_con_mas_victorias = "M"
+        elif self.victorias_por_genero["F"] > self.victorias_por_genero["M"]:
+            self.genero_con_mas_victorias = "F"
+        else:
+            self.genero_con_mas_victorias = "Empate"
+
+        # Actualizar el contador global si no fue empate
+        if self.genero_con_mas_victorias != "Empate":
+            Juego.generos_victorias_totales[self.genero_con_mas_victorias] += 1
