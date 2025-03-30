@@ -1,5 +1,5 @@
-import random
 import uuid
+from modelos.random_wrapper import randint, uniform
 
 
 class Jugador:
@@ -26,7 +26,7 @@ class Jugador:
     def _generar_habilidades(self):
         # Generamos y guardamos los valores iniciales
         # resistencia: 35 ± 10
-        self.resistencia_inicial = random.randint(25, 45)  # 35 ± 10
+        self.resistencia_inicial = randint(25, 45)  # 35 ± 10
         self.experiencia_inicial = 10
         self.rondas_con_beneficio = 0
 
@@ -83,7 +83,7 @@ class Jugador:
         - Se resta el cansancio acumulado más 1-2 unidades adicionales
         - Se actualiza la resistencia actual partiendo de la inicial
         """
-        perdida_adicional = random.randint(1, 2)
+        perdida_adicional = randint(1, 2)  # Usar nuestro generador en lugar de random
         self.cansancio_acumulado += perdida_adicional
         self.resistencia = self.resistencia_inicial - self.cansancio_acumulado
 
@@ -102,7 +102,7 @@ class Jugador:
 
     def reiniciar_suerte(self):
         """Reinicia la suerte del jugador para cada ronda"""
-        self.suerte = round(random.uniform(1.0, 3.0), 2)
+        self.suerte = round(uniform(1.0, 3.0), 2)
 
     def guardar_puntaje_total(self):
         """Guarda el puntaje total acumulado del jugador"""

@@ -1,8 +1,7 @@
 from .jugador import Jugador
-import random
 import names
 import uuid
-
+from modelos.random_wrapper import choice, shuffle
 
 class Equipo:
     def __init__(self, nombre, num_jugadores=5):
@@ -31,12 +30,12 @@ class Equipo:
 
         # Para el resto de jugadores, asignar género aleatoriamente
         for _ in range(num_jugadores - 2):
-            genero = random.choice(["M", "F"])
+            genero = choice(["M", "F"])
             nombre = names.get_full_name(gender="male" if genero == "M" else "female")
             jugadores.append(Jugador(nombre, genero))
 
         # Mezclar la lista para que el orden sea aleatorio
-        random.shuffle(jugadores)
+        shuffle(jugadores)
         return jugadores
 
     def realizar_ronda(self):

@@ -1,8 +1,7 @@
-import random
 import math
 from dataclasses import asdict, dataclass
 from typing import List, Dict
-
+from modelos.random_wrapper import uniform, choices
 
 @dataclass
 class Lanzamiento:
@@ -109,26 +108,29 @@ class Blanco:
         return {zona: prob / total for zona, prob in probs.items()}
 
     def _generar_tiro(self, probs: Dict[str, float]) -> tuple:
-        """Genera coordenadas del tiro usando random estándar"""
+        """Genera coordenadas del tiro usando nuestro generador validado"""
         # Seleccionar zona
-        zona = random.choices(
-            population=list(probs.keys()), weights=list(probs.values()), k=1
+        zona = choices(
+            population=list(probs.keys()), 
+            weights=list(probs.values()), 
+            k=1
         )[0]
 
         # Calcular radio según zona
         if zona == "ERROR":
-            radio = random.uniform(
-                self.RADIO_EXTERIOR, self.RADIO_EXTERIOR * self.RADIO_ERROR_MULTIPLIER
+            radio = uniform(
+                self.RADIO_EXTERIOR, 
+                self.RADIO_EXTERIOR * self.RADIO_ERROR_MULTIPLIER
             )
         elif zona == "EXTERIOR":
-            radio = random.uniform(self.RADIO_INTERMEDIA, self.RADIO_EXTERIOR)
+            radio = uniform(self.RADIO_INTERMEDIA, self.RADIO_EXTERIOR)
         elif zona == "INTERMEDIA":
-            radio = random.uniform(self.RADIO_CENTRAL, self.RADIO_INTERMEDIA)
+            radio = uniform(self.RADIO_CENTRAL, self.RADIO_INTERMEDIA)
         else:  # CENTRAL
-            radio = random.uniform(0, self.RADIO_CENTRAL)
+            radio = uniform(0, self.RADIO_CENTRAL)
 
         # Generar coordenadas polares
-        angulo = random.uniform(0, 2 * math.pi)
+        angulo = uniform(0, 2 * math.pi)
         x = round(radio * math.cos(angulo), 2)
         y = round(radio * math.sin(angulo), 2)
 

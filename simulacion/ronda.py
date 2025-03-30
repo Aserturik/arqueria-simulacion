@@ -1,4 +1,4 @@
-import random
+from modelos.random_wrapper import randint
 
 
 class Ronda:
@@ -259,7 +259,7 @@ class Ronda:
 
     def _recuperar_resistencia(self):
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
-            jugador.cansancio_acumulado += random.randint(1, 2)
+            jugador.cansancio_acumulado += randint(1, 2)
 
             # Decrementar contador de rondas con beneficio si está activo
             if jugador.beneficio_resistencia and jugador.rondas_con_beneficio > 0:
