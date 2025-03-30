@@ -111,35 +111,49 @@
 
       <!-- Resumen del juego actual -->
       <div class="resumen-actual">
-        <h2>Último Juego Simulado</h2>
+        <h2>
+          Último Juego Simulado (Juego #{{ simulacion_data.numero_juego }})
+        </h2>
         <p>{{ resultado_final }}</p>
 
-        <h3>Estadísticas por Ronda</h3>
+        <!-- Nueva sección: Tabla de jugadores destacados -->
+        <h3>Jugadores Destacados</h3>
         <table border="1" cellspacing="0" cellpadding="5">
           <thead>
             <tr>
-              <th>Ronda</th>
-              <th>{{ simulacion_data.equipo1.nombre }} (Puntos)</th>
-              <th>{{ simulacion_data.equipo2.nombre }} (Puntos)</th>
+              <th>Categoría</th>
+              <th>Nombre</th>
+              <th>Valor</th>
             </tr>
           </thead>
           <tbody>
-            {% for ronda in simulacion_data.historial_puntajes %}
+            {% if simulacion_data.jugador_con_mas_suerte and
+            simulacion_data.jugador_con_mas_suerte != "No determinado" %}
             <tr>
-              <td>{{ ronda.ronda }}</td>
-              <td>{{ ronda.equipo1.puntaje }}</td>
-              <td>{{ ronda.equipo2.puntaje }}</td>
+              <td>Jugador con más suerte</td>
+              <td>{{ simulacion_data.jugador_con_mas_suerte.nombre }}</td>
+              <td>{{ simulacion_data.jugador_con_mas_suerte.suerte }}</td>
             </tr>
-            {% endfor %}
+            {% endif %} {% if simulacion_data.jugador_con_mas_experiencia and
+            simulacion_data.jugador_con_mas_experiencia != "No determinado" %}
+            <tr>
+              <td>Jugador con más experiencia</td>
+              <td>{{ simulacion_data.jugador_con_mas_experiencia.nombre }}</td>
+              <td>
+                {{ simulacion_data.jugador_con_mas_experiencia.experiencia }}
+              </td>
+            </tr>
+            {% endif %}
           </tbody>
         </table>
 
+        <!-- Actualización del Resumen Final -->
         <h3>Resumen Final</h3>
         <table border="1" cellspacing="0" cellpadding="5">
           <tr>
             <th>Equipo</th>
             <th>Rondas Ganadas</th>
-            <th>Puntaje Total</th>
+            <th>Juegos Ganados</th>
           </tr>
           <tr>
             <td>{{ simulacion_data.equipo1.nombre }}</td>
@@ -153,6 +167,17 @@
           </tr>
         </table>
 
+        <!-- Resultado del último juego -->
+        <h3>Resultado del Último Juego</h3>
+        <p>
+          <strong>Ganador: </strong>
+          {% if simulacion_data.equipo_ganador %} {% if
+          simulacion_data.equipo_ganador.nombre == "Empate" %} Empate {% else %}
+          {{ simulacion_data.equipo_ganador.nombre }} con {{
+          simulacion_data.equipo_ganador.puntaje }} puntos {% endif %} {% else
+          %} No determinado {% endif %}
+        </p>
+
         <form action="{{ url_for('graficas') }}" method="get">
           <input
             type="hidden"
@@ -162,6 +187,8 @@
           <button type="submit">Generar Gráficas</button>
         </form>
       </div>
+
+      <!-- El resto del contenido se mantiene igual -->
 
       <!-- Filtros para todos los juegos -->
       <div class="filters">

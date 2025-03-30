@@ -136,13 +136,65 @@ def jugar():
 
 @app.route("/resultados", methods=["GET"])
 def resultados():
-    # Obtener el ID del juego de la sesión (si está disponible)
+    # Obtener el ID del juego de la sesión
     game_id = session.get("game_id", None)
 
-    # Puedes pasar datos del último juego si lo necesitas
-    return render_template(
-        "resultados.html",
-        simulacion_data={
+    # Cargar datos del archivo JSON
+    try:
+        with open("resultados_acumulados.json", "r") as f:
+            todos_resultados = json.load(f)
+
+        # Obtener el último juego
+        if todos_resultados:
+            ultimo_juego = todos_resultados[-1]
+
+            # Crear datos para pasar a la plantilla
+            simulacion_data = {
+                "id_juego": ultimo_juego["id_juego"],
+                "equipo1": {
+                    "nombre": ultimo_juego["equipo_1"]["nombre"],
+                    "rondas_ganadas": ultimo_juego["equipo_1"]["rondas_ganadas"],
+                    "puntaje_total": ultimo_juego["equipo_1"]["puntaje_total"],
+                },
+                "equipo2": {
+                    "nombre": ultimo_juego["equipo_2"]["nombre"],
+                    "rondas_ganadas": ultimo_juego["equipo_2"]["rondas_ganadas"],
+                    "puntaje_total": ultimo_juego["equipo_2"]["puntaje_total"],
+                },
+                "historial_puntajes": [],  # No tenemos historial de rondas detallado
+                "jugador_con_mas_suerte": ultimo_juego["jugador_con_mas_suerte"],
+                "jugador_con_mas_experiencia": ultimo_juego[
+                    "jugador_con_mas_experiencia"
+                ],
+                "equipo_ganador": ultimo_juego["equipo_ganador"],
+                "total_juegos": len(todos_resultados),
+                "numero_juego": ultimo_juego["numero_juego"],
+            }
+
+            resultado_final = f"Simulación completada con éxito: {len(todos_resultados)} juegos simulados"
+
+        else:
+            # Datos predeterminados si no hay resultados
+            simulacion_data = {
+                "id_juego": game_id,
+                "equipo1": {
+                    "nombre": "Los tiguere",
+                    "rondas_ganadas": 0,
+                    "puntaje_total": 0,
+                },
+                "equipo2": {
+                    "nombre": "Los jaguares",
+                    "rondas_ganadas": 0,
+                    "puntaje_total": 0,
+                },
+                "historial_puntajes": [],
+                "total_juegos": 0,
+            }
+            resultado_final = "No hay resultados disponibles"
+
+    except (FileNotFoundError, json.JSONDecodeError):
+        # Manejar error si el archivo no existe o está corrupto
+        simulacion_data = {
             "id_juego": game_id,
             "equipo1": {
                 "nombre": "Los tiguere",
@@ -155,8 +207,14 @@ def resultados():
                 "puntaje_total": 0,
             },
             "historial_puntajes": [],
-        },
-        resultado_final="Simulación completada con éxito",
+            "total_juegos": 0,
+        }
+        resultado_final = "Error al cargar resultados"
+
+    return render_template(
+        "resultados.html",
+        simulacion_data=simulacion_data,
+        resultado_final=resultado_final,
     )
 
 
