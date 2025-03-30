@@ -8,7 +8,6 @@ class Jugador:
         self.nombre = nombre
         self.genero = genero  # 'M' o 'F'
         self._generar_habilidades()
-        self.rondas_ganadas = 0
         self.suerte = 0
         self.puntaje_total = 0
         self.puntaje_juego_anterior = 0

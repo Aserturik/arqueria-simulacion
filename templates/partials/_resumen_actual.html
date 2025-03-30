@@ -3,13 +3,90 @@
   <h2>Último Juego Simulado (Juego #{{ simulacion_data.numero_juego }})</h2>
   <p>{{ resultado_final }}</p>
 
+  <!-- Tabla de equipos con sus arqueros -->
+  <h3>Arqueros por Equipo</h3>
+
+  <div class="equipos-container">
+    <!-- Tabla del equipo 1 -->
+    <div class="equipo-tabla">
+      <h4>{{ simulacion_data.equipo1.nombre }}</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Género</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for jugador in simulacion_data.equipo1.jugadores %}
+          <tr>
+            <td>{{ jugador.nombre }}</td>
+            <td>{{ jugador.genero }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tabla del equipo 2 -->
+    <div class="equipo-tabla">
+      <h4>{{ simulacion_data.equipo2.nombre }}</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Género</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for jugador in simulacion_data.equipo2.jugadores %}
+          <tr>
+            <td>{{ jugador.nombre }}</td>
+            <td>{{ jugador.genero }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Resumen Final -->
   <h3>Resumen Final</h3>
-  <table border="1" cellspacing="0" cellpadding="5">
-    <!-- Resumen final... -->
+  <table>
+    <tr>
+      <th>Equipo</th>
+      <th>Puntaje Total</th>
+    </tr>
+    <tr>
+      <td>{{ simulacion_data.equipo1.nombre }}</td>
+      <td>{{ simulacion_data.equipo1.puntaje_total }}</td>
+    </tr>
+    <tr>
+      <td>{{ simulacion_data.equipo2.nombre }}</td>
+      <td>{{ simulacion_data.equipo2.puntaje_total }}</td>
+    </tr>
   </table>
 
-  <form action="{{ url_for('graficas') }}" method="get">
-    <input type="hidden" name="game_id" value="{{ simulacion_data.id_juego }}" />
-    <button type="submit">Generar Gráficas</button>
-  </form>
+  <!-- Resultado del último juego -->
+  {% if simulacion_data.equipo_ganador %}
+  <h3>Resultado del Último Juego</h3>
+  <p>
+    <strong>Ganador: </strong>
+    {% if simulacion_data.equipo_ganador.nombre == "Empate" %} Empate {% else %}
+    {{ simulacion_data.equipo_ganador.nombre }} con {{
+    simulacion_data.equipo_ganador.puntaje }} puntos {% endif %}
+  </p>
+  {% endif %}
+
+  <div class="botones-accion">
+    <form action="{{ url_for('graficas') }}" method="get">
+      <input
+        type="hidden"
+        name="game_id"
+        value="{{ simulacion_data.id_juego }}"
+      />
+      <button type="submit" class="btn-primary">Generar Gráficas</button>
+    </form>
+    <a href="{{ url_for('index') }}" class="btn-secondary">Volver al Inicio</a>
+  </div>
 </div>

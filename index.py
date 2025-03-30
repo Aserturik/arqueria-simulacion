@@ -8,6 +8,9 @@ import time
 app = Flask(__name__)
 app.secret_key = "tu_clave_secreta"
 
+equipo_1 = Equipo("Los tiguere", 5)
+equipo_2 = Equipo("Los jaguares", 5)
+
 JSON_FILE = "simulacion_data.json"
 
 # Deshabilitar prints para mejor rendimiento
@@ -45,10 +48,8 @@ def jugar():
     tiempo_inicio = time.time()
     original_print("Iniciando simulación...")
 
-    equipo_1 = Equipo("Los tiguere", 5)
-    equipo_2 = Equipo("Los jaguares", 5)
-
-    total_juegos = 20000
+    total_juegos = 200
+    global equipo_1, equipo_2
     todos_resultados = []
     ultimo_juego = None
 
@@ -127,6 +128,7 @@ def jugar():
 def resultados():
     # Obtener el ID del juego de la sesión
     game_id = session.get("game_id", None)
+    global equipo_1, equipo_2
 
     # Cargar datos del archivo JSON
     try:
@@ -136,7 +138,7 @@ def resultados():
         # Obtener el último juego
         if todos_resultados:
             ultimo_juego = todos_resultados[-1]
-
+            
             # Crear datos para pasar a la plantilla
             simulacion_data = {
                 "id_juego": ultimo_juego["id_juego"],
@@ -144,11 +146,25 @@ def resultados():
                     "nombre": ultimo_juego["equipo_1"]["nombre"],
                     "rondas_ganadas": ultimo_juego["equipo_1"]["rondas_ganadas"],
                     "puntaje_total": ultimo_juego["equipo_1"]["puntaje_total"],
+                    "jugadores": [
+                        {
+                            "nombre": jugador.nombre,
+                            "genero": jugador.genero,
+                        }
+                        for jugador in equipo_1.jugadores
+                    ]
                 },
                 "equipo2": {
                     "nombre": ultimo_juego["equipo_2"]["nombre"],
                     "rondas_ganadas": ultimo_juego["equipo_2"]["rondas_ganadas"],
                     "puntaje_total": ultimo_juego["equipo_2"]["puntaje_total"],
+                    "jugadores": [
+                        {
+                            "nombre": jugador.nombre,
+                            "genero": jugador.genero,
+                        }
+                        for jugador in equipo_2.jugadores
+                    ]
                 },
                 "historial_puntajes": [],  # No tenemos historial de rondas detallado
                 "jugador_con_mas_suerte": ultimo_juego["jugador_con_mas_suerte"],
