@@ -165,3 +165,79 @@ table tr:nth-child(even) {
   text-align: center;
   padding: 20px;
 }
+
+/* Estilos para paginación y búsqueda */
+.games-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.search-box {
+  flex: 1;
+  max-width: 300px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.pagination-options {
+  display: flex;
+  align-items: center;
+}
+
+.pagination-options label {
+  margin-right: 8px;
+}
+
+.pagination-info {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 5px;
+}
+
+.page-btn {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background-color: #f5f5f5;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.page-btn:hover {
+  background-color: #e5e5e5;
+}
+
+.page-btn.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.page-ellipsis {
+  margin: 0 5px;
+}

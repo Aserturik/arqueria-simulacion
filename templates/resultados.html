@@ -20,8 +20,33 @@
       </div>
 
       <h2>Historial de Juegos</h2>
+      
+      <!-- Controles de paginación y búsqueda -->
+      <div class="games-controls">
+        <div class="search-box">
+          <input 
+            type="text" 
+            id="game-search" 
+            placeholder="Buscar por número o equipo..."
+          >
+        </div>
+        <div class="pagination-options">
+          <label for="games-per-page">Juegos por página:</label>
+          <select id="games-per-page">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+      </div>
+      
+      <div id="pagination-info" class="pagination-info">Cargando...</div>
       <div id="game-loading" class="loading">Cargando juegos...</div>
       <div id="game-list" class="game-list"></div>
+      
+      <!-- Controles de paginación -->
+      <div id="pagination-controls" class="pagination-controls"></div>
 
       <a href="{{ url_for('index') }}" class="volver">Volver al Inicio</a>
     </div>
