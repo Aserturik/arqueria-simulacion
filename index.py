@@ -8,6 +8,7 @@ from flask import (
     jsonify,
     request,
 )
+from utils.graficas import generar_grafica_puntos_jugadores_response
 from simulacion.juego import Juego
 from simulacion.equipo import Equipo
 import numpy as np
@@ -71,7 +72,7 @@ def jugar():
     tiempo_inicio = time.time()
     print("Iniciando simulación...")
 
-    total_juegos = 200
+    total_juegos = 20000
     global equipo_1, equipo_2, todos_resultados
 
     # Reiniciar la lista de resultados
@@ -288,7 +289,8 @@ def serve_json():
 
 @app.route("/graficas", methods=["GET"])
 def graficas():
-    return render_template("graficas.html")
+    grafica_img = generar_grafica_puntos_jugadores_response()
+    return render_template("graficas.html", grafica_img=grafica_img)
 
 
 @app.route("/todos_juegos", methods=["GET"])
