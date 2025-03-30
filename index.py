@@ -71,7 +71,7 @@ def jugar():
     tiempo_inicio = time.time()
     print("Iniciando simulación...")
 
-    total_juegos = 200
+    total_juegos = 2000
     global equipo_1, equipo_2, todos_resultados
 
     # Reiniciar la lista de resultados
@@ -111,6 +111,10 @@ def jugar():
             "generos_victorias_totales": {
                 "M": juego.victorias_por_genero["M"],
                 "F": juego.victorias_por_genero["F"],
+            },
+            "generos_victorias_globales": {
+                "M": Juego.generos_victorias_totales["M"],
+                "F": Juego.generos_victorias_totales["F"],
             },
             "equipo_ganador": (
                 {
@@ -215,6 +219,11 @@ def resultados():
                 "equipo_ganador": ultimo_juego["equipo_ganador"],
                 "total_juegos": len(todos_resultados),
                 "numero_juego": ultimo_juego["numero_juego"],
+                "generos_victorias_totales": ultimo_juego["generos_victorias_totales"],
+                "generos_victorias_globales": {
+                    "M": Juego.generos_victorias_totales["M"],
+                    "F": Juego.generos_victorias_totales["F"],
+                },
             }
 
             resultado_final = f"Simulación completada con éxito: {len(todos_resultados)} juegos simulados"

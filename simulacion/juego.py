@@ -54,7 +54,7 @@ class Juego:
         self.reiniciar_equipos()
 
     def guardar_estadisticas(self):
-        if self.equipo_ganador_del_juego is not None:
+        if self.equipo_ganador_juego is not None:
             self.equipo_ganador_juego.puntaje_juego += self.puntaje_ganador
 
     def equipo_ganador_del_juego(self):
