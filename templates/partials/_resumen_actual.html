@@ -3,22 +3,10 @@
   <h2>Último Juego Simulado (Juego #{{ simulacion_data.numero_juego }})</h2>
   <p>{{ resultado_final }}</p>
 
-  <h3>Jugadores Destacados</h3>
-  <table border="1" cellspacing="0" cellpadding="5">
-    <!-- Tabla de jugadores destacados... -->
-  </table>
-
   <h3>Resumen Final</h3>
   <table border="1" cellspacing="0" cellpadding="5">
     <!-- Resumen final... -->
   </table>
-
-  <h3>Resultado del Último Juego</h3>
-  <p><strong>Ganador: </strong>
-    {% if simulacion_data.equipo_ganador %}
-      <!-- Lógica del ganador... -->
-    {% endif %}
-  </p>
 
   <form action="{{ url_for('graficas') }}" method="get">
     <input type="hidden" name="game_id" value="{{ simulacion_data.id_juego }}" />

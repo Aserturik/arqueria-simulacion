@@ -173,64 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
       gameDetails.appendChild(gameBody);
       gameList.appendChild(gameDetails);
     });
-  }
-
-  // Función para crear estadísticas de resumen
-  function createSummaryStatistics(games) {
-    if (!games || games.length === 0) return;
-
-    // Contadores para estadísticas
-    const equiposVictorias = {};
-    const jugadoresSuerte = {};
-    const jugadoresExperiencia = {};
-
-    // Procesar cada juego
-    games.forEach((game) => {
-      // Contar victorias por equipo
-      if (game.equipo_ganador && game.equipo_ganador.nombre !== "Empate") {
-        const equipoNombre = game.equipo_ganador.nombre;
-        equiposVictorias[equipoNombre] =
-          (equiposVictorias[equipoNombre] || 0) + 1;
-      }
-
-      // Registrar jugadores con más suerte
-      if (
-        game.jugador_con_mas_suerte &&
-        typeof game.jugador_con_mas_suerte !== "string"
-      ) {
-        const jugadorSuerte = game.jugador_con_mas_suerte.nombre;
-        jugadoresSuerte[jugadorSuerte] =
-          (jugadoresSuerte[jugadorSuerte] || 0) + 1;
-      }
-
-      // Registrar jugadores con más experiencia
-      if (
-        game.jugador_con_mas_experiencia &&
-        typeof game.jugador_con_mas_experiencia !== "string"
-      ) {
-        const jugadorExp = game.jugador_con_mas_experiencia.nombre;
-        jugadoresExperiencia[jugadorExp] =
-          (jugadoresExperiencia[jugadorExp] || 0) + 1;
-      }
-    });
-
-    // Actualizar la sección de estadísticas
-    updateStatisticsSection(
-      "equipos-stats",
-      equiposVictorias,
-      "Victorias por Equipo"
-    );
-    updateStatisticsSection(
-      "jugadores-suerte-stats",
-      jugadoresSuerte,
-      "Jugadores con Más Suerte"
-    );
-    updateStatisticsSection(
-      "jugadores-exp-stats",
-      jugadoresExperiencia,
-      "Jugadores con Más Experiencia"
-    );
-  }
+  } 
 
   // Función para actualizar una sección de estadísticas
   function updateStatisticsSection(elementId, data, title) {
