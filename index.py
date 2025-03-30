@@ -87,7 +87,9 @@ def jugar():
             "equipo_ganador": (
                 {
                     "nombre": juego.equipo_ganador_juego.nombre,
-                    "puntaje": juego.equipo_ganador_juego.puntaje_juego,
+                    "puntaje": juego.equipo_ganador_juego.puntaje_juego
+                    if hasattr(juego.equipo_ganador_juego, "puntaje_juego") and juego.equipo_ganador_juego is not None
+                    else (juego.equipo_ganador_juego.puntaje_total if hasattr(juego.equipo_ganador_juego, "puntaje_total") else 0),
                 }
                 if juego.equipo_ganador_juego is not None
                 else {"nombre": "Empate", "puntaje": 0}
