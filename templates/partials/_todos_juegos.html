@@ -1,0 +1,25 @@
+<!-- templates/partials/_todos_juegos.html -->
+<div class="filters">
+  <h2>Todos los Juegos</h2>
+  <div>
+    <label for="juego-desde">Mostrar juegos desde:</label>
+    <input type="number" id="juego-desde" min="1" value="1" />
+
+    <label for="juego-hasta">hasta:</label>
+    <input type="number" id="juego-hasta" min="1" value="50" />
+
+    <button id="filtrar-btn">Filtrar</button>
+
+    <label for="items-per-page">Juegos por página:</label>
+    <select id="items-per-page">
+      <option value="10">10</option>
+      <option value="20" selected>20</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+  </div>
+</div>
+
+<div id="loading" class="loading">Cargando resultados...</div>
+<div id="games-container"></div>
+<div class="pagination" id="pagination"></div>

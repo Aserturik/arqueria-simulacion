@@ -4,9 +4,7 @@ from flask import (
     redirect,
     url_for,
     session,
-    request,
     send_file,
-    jsonify,
 )
 from simulacion.juego import Juego
 from simulacion.equipo import Equipo
