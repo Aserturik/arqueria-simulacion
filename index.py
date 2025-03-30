@@ -59,7 +59,7 @@ def jugar():
     equipo_1 = Equipo("Los tiguere", 5)
     equipo_2 = Equipo("Los jaguares", 5)
 
-    total_juegos = 20000
+    total_juegos = 200
     todos_resultados = []
     ultimo_juego = None
 
@@ -131,7 +131,33 @@ def jugar():
     session["game_id"] = juego.id_juego
 
     # Importante: devolver una respuesta válida
-    return redirect(url_for("graficas"))
+    return redirect(url_for("resultados"))
+
+
+@app.route("/resultados", methods=["GET"])
+def resultados():
+    # Obtener el ID del juego de la sesión (si está disponible)
+    game_id = session.get("game_id", None)
+
+    # Puedes pasar datos del último juego si lo necesitas
+    return render_template(
+        "resultados.html",
+        simulacion_data={
+            "id_juego": game_id,
+            "equipo1": {
+                "nombre": "Los tiguere",
+                "rondas_ganadas": 0,
+                "puntaje_total": 0,
+            },
+            "equipo2": {
+                "nombre": "Los jaguares",
+                "rondas_ganadas": 0,
+                "puntaje_total": 0,
+            },
+            "historial_puntajes": [],
+        },
+        resultado_final="Simulación completada con éxito",
+    )
 
 
 @app.route("/resultados_acumulados.json")
