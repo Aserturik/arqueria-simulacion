@@ -100,9 +100,7 @@ def jugar():
             "equipo_ganador": (
                 {
                     "nombre": juego.equipo_ganador_juego.nombre,
-                    "puntaje": juego.equipo_ganador_juego.puntaje_juego
-                    if hasattr(juego.equipo_ganador_juego, "puntaje_juego") and juego.equipo_ganador_juego is not None
-                    else (juego.equipo_ganador_juego.puntaje_total if hasattr(juego.equipo_ganador_juego, "puntaje_total") else 0),
+                    "puntaje": juego.puntaje_ganador,
                 }
                 if juego.equipo_ganador_juego is not None
                 else {"nombre": "Empate", "puntaje": 0}
@@ -111,12 +109,12 @@ def jugar():
             "equipo_1": {
                 "nombre": juego.equipo1.nombre,
                 "rondas_ganadas": juego.equipo1.rondas_ganadas,
-                "puntaje_total": juego.equipo1.juegos_ganados,
+                "puntaje_total": juego.puntaje_equipo1_final,
             },
             "equipo_2": {
                 "nombre": juego.equipo2.nombre,
                 "rondas_ganadas": juego.equipo2.rondas_ganadas,
-                "puntaje_total": juego.equipo2.juegos_ganados,
+                "puntaje_total": juego.puntaje_equipo2_final,
             },
         }
 

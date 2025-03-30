@@ -13,7 +13,10 @@ class Juego:
         self.ronda_actual = 0
         self.historial_rondas = []
         self.juego_actual = juego_actual
-        self.exxperiencia_maxima = 0
+        self.equipo1.puntaje_juego = 0
+        self.equipo2.puntaje_juego = 0
+        self.puntaje_ganador = 0
+        self.experiencia_maxima = 0
         # Requisitos solicitados:
         self.jugador_con_mas_suerte = None
         self.jugador_con_mas_experiencia = None
@@ -41,13 +44,34 @@ class Juego:
 
     def _finalizar_juego(self):
         self.equipo_ganador_del_juego()
+        self.puntaje_equipo1_final = self.equipo1.puntaje_juego
+        self.puntaje_equipo2_final = self.equipo2.puntaje_juego
+        self.guardar_estadisticas()
         self.reiniciar_equipos()
 
-    def equipo_ganador_del_juego(self):
-        for ronda in self.historial_rondas:
-            self.equipo1.puntaje_juego += ronda["equipo 1"]["puntaje"]
-            self.equipo2.puntaje_juego += ronda["equipo 2"]["puntaje"]
+    def guardar_estadisticas(self):
+        if self.equipo_ganador_del_juego:
+            self.equipo_ganador_juego.puntaje_juego += self.puntaje_ganador
 
+    def equipo_ganador_del_juego(self):
+        # Calcular puntajes totales del juego
+        self.equipo1.puntaje_juego = sum(
+            ronda["equipo 1"]["puntaje"] for ronda in self.historial_rondas
+        )
+        self.equipo2.puntaje_juego = sum(
+            ronda["equipo 2"]["puntaje"] for ronda in self.historial_rondas
+        )
+
+        # Asignar puntajes a los equipos
+        self.equipo1.puntaje_juego = self.equipo1.puntaje_juego
+        self.equipo2.puntaje_juego = self.equipo2.puntaje_juego
+
+        # Guardar el puntaje más alto
+        self.puntaje_ganador = max(
+            self.equipo1.puntaje_juego, self.equipo2.puntaje_juego
+        )
+
+        # Determinar ganador
         if self.equipo1.puntaje_juego > self.equipo2.puntaje_juego:
             self.equipo1.juegos_ganados += 1
             self.equipo_ganador_juego = self.equipo1
@@ -55,9 +79,7 @@ class Juego:
             self.equipo2.juegos_ganados += 1
             self.equipo_ganador_juego = self.equipo2
         else:
-            # Empate en el juego
-            self.equipo1.juegos_ganados += 0
-            self.equipo2.juegos_ganados += 0
+            # Empate
             self.equipo_ganador_juego = None
 
     def reiniciar_equipos(self):
