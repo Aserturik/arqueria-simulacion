@@ -71,7 +71,7 @@ def jugar():
     tiempo_inicio = time.time()
     print("Iniciando simulación...")
 
-    total_juegos = 2000
+    total_juegos = 200
     global equipo_1, equipo_2, todos_resultados
 
     # Reiniciar la lista de resultados

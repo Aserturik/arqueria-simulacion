@@ -49,45 +49,6 @@
       </table>
     </div>
   </div>
-
-  <!-- Resumen Final -->
-  <h3>Resumen Final</h3>
-  <table>
-    <tr>
-      <th>Equipo</th>
-      <th>Puntaje Total</th>
-    </tr>
-    <tr>
-      <td>{{ simulacion_data.equipo1.nombre }}</td>
-      <td>{{ simulacion_data.equipo1.puntaje_total }}</td>
-    </tr>
-    <tr>
-      <td>{{ simulacion_data.equipo2.nombre }}</td>
-      <td>{{ simulacion_data.equipo2.puntaje_total }}</td>
-    </tr>
-  </table>
-
-  <!-- Resultado del último juego -->
-  {% if simulacion_data.equipo_ganador %}
-  <!-- Reemplazar la sección del resultado del último juego con esto: -->
-
-  <!-- Resultado del último juego -->
-  <h3>Resultado del Último Juego</h3>
-  <p>
-    <strong>Ganador: </strong>
-    {% if simulacion_data.equipo_ganador and
-    simulacion_data.equipo_ganador.nombre == "Empate" %} Empate {% elif
-    simulacion_data.equipo_ganador %} {{ simulacion_data.equipo_ganador.nombre
-    }} con {% if 'puntaje' in simulacion_data.equipo_ganador %} {{
-    simulacion_data.equipo_ganador.puntaje }} {% else %}
-    <!-- Si estamos usando el campo puntaje_total del equipo ganador -->
-    {% if simulacion_data.equipo_ganador.nombre ==
-    simulacion_data.equipo1.nombre %} {{ simulacion_data.equipo1.puntaje_total
-    }} {% else %} {{ simulacion_data.equipo2.puntaje_total }} {% endif %} {%
-    endif %} puntos {% else %} No determinado {% endif %}
-  </p>
-  {% endif %}
-
   <div class="botones-accion">
     <form action="{{ url_for('graficas') }}" method="get">
       <input
