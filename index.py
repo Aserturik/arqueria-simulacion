@@ -13,6 +13,7 @@ from simulacion.juego import Juego
 from simulacion.equipo import Equipo
 import numpy as np
 import json
+import threading
 import time
 
 app = Flask(__name__)
@@ -24,6 +25,12 @@ equipo_2 = Equipo("Los jaguares", 5)
 todos_resultados = []  # Variable global para almacenar todos los resultados
 
 JSON_FILE = "simulacion_data.json"
+
+# Variables para el progreso de la simulación
+simulacion_en_progreso = False
+progreso_actual = 0
+total_juegos_simulacion = 20000
+juegos_completados = 0
 
 
 def convert_numpy(obj):
@@ -101,6 +108,127 @@ def buscar_juego_por_id(juego_id):
 def index():
     return render_template("index.html")
 
+
+@app.route("/iniciar_simulacion", methods=["POST"])
+def iniciar_simulacion():
+    global simulacion_en_progreso, progreso_actual, juegos_completados, total_juegos_simulacion
+
+    if simulacion_en_progreso:
+        return jsonify({"error": "Ya hay una simulación en progreso"}), 400
+
+    # Resetear variables de progreso
+    progreso_actual = 0
+    juegos_completados = 0
+
+    # Iniciar la simulación en un hilo separado
+    thread = threading.Thread(target=ejecutar_simulacion)
+    thread.daemon = True
+    thread.start()
+
+    return jsonify({"status": "Simulación iniciada correctamente"})
+
+
+@app.route('/progreso_simulacion', methods=['GET'])
+def progreso_simulacion():
+    global progreso_actual, juegos_completados, total_juegos_simulacion
+    
+    return jsonify({
+        "progreso": progreso_actual,
+        "juegos_completados": juegos_completados,
+        "total_juegos": total_juegos_simulacion
+    })
+
+def ejecutar_simulacion():
+    """
+    Función que ejecuta la simulación en segundo plano, actualizando el progreso.
+    """
+    global simulacion_en_progreso, progreso_actual, juegos_completados
+    global equipo_1, equipo_2, todos_resultados, total_juegos_simulacion
+    
+    try:
+        simulacion_en_progreso = True
+        tiempo_inicio = time.time()
+        print("Iniciando simulación en segundo plano...")
+        
+        # Reiniciar la lista de resultados
+        todos_resultados = []
+        
+        for i in range(total_juegos_simulacion):
+            if i % 1000 == 0:
+                print(f"Progreso: {i}/{total_juegos_simulacion} juegos ({i/total_juegos_simulacion*100:.1f}%)")
+            
+            juego = Juego(equipo_1, equipo_2, num_rondas=10, juego_actual=i + 1)
+            juego.jugar_juego_completo()
+            
+            resultado_juego = {
+                "id_juego": juego.id_juego,
+                "jugador_con_mas_suerte": (
+                    {
+                        "nombre": juego.jugador_con_mas_suerte.nombre,
+                        "user_id": juego.jugador_con_mas_suerte.user_id,
+                        "suerte": juego.jugador_con_mas_suerte.suerte,
+                    }
+                    if isinstance(juego.jugador_con_mas_suerte, object)
+                    and hasattr(juego.jugador_con_mas_suerte, "nombre")
+                    else "No determinado"
+                ),
+                "jugador_con_mas_experiencia": (
+                    {
+                        "nombre": juego.jugador_con_mas_experiencia.nombre,
+                        "user_id": juego.jugador_con_mas_experiencia.user_id,
+                        "experiencia": juego.experiencia_maxima,
+                    }
+                    if isinstance(juego.jugador_con_mas_experiencia, object)
+                    and hasattr(juego.jugador_con_mas_experiencia, "nombre")
+                    else "No determinado"
+                ),
+                "genero_con_mas_victorias": juego.genero_con_mas_victorias,
+                "generos_victorias_totales": {
+                    "M": juego.victorias_por_genero["M"],
+                    "F": juego.victorias_por_genero["F"],
+                },
+                "generos_victorias_globales": {
+                    "M": Juego.generos_victorias_totales["M"],
+                    "F": Juego.generos_victorias_totales["F"],
+                },
+                "equipo_ganador": (
+                    {
+                        "nombre": juego.equipo_ganador_juego.nombre,
+                        "puntaje": juego.puntaje_ganador,
+                    }
+                    if juego.equipo_ganador_juego is not None
+                    else {"nombre": "Empate", "puntaje": 0}
+                ),
+                "numero_juego": juego.juego_actual,
+                "equipo_1": {
+                    "nombre": juego.equipo1.nombre,
+                    "rondas_ganadas": juego.equipo1.rondas_ganadas,
+                    "puntaje_total": juego.puntaje_equipo1_final,
+                },
+                "equipo_2": {
+                    "nombre": juego.equipo2.nombre,
+                    "rondas_ganadas": juego.equipo2.rondas_ganadas,
+                    "puntaje_total": juego.puntaje_equipo2_final,
+                },
+            }
+            
+            todos_resultados.append(convert_numpy(resultado_juego))
+            
+            # Actualizar el progreso
+            juegos_completados = i + 1
+            progreso_actual = int((i + 1) / total_juegos_simulacion * 100)
+        
+        # Escribir resultados al archivo
+        with open("resultados_acumulados.json", "w") as f:
+            json.dump(todos_resultados, f)
+        
+        tiempo_total = time.time() - tiempo_inicio
+        print(f"Simulación completada en {tiempo_total:.2f} segundos")
+        
+    except Exception as e:
+        print(f"Error en la simulación: {str(e)}")
+    finally:
+        simulacion_en_progreso = False
 
 @app.route("/jugar", methods=["POST"])
 def jugar():
@@ -405,16 +533,16 @@ def todos_juegos():
 def juego_por_id(id):
     """
     Endpoint API que retorna los datos de un juego específico por su número.
-    
+
     Esta función permite consultar mediante API los detalles completos de una
     simulación específica. A diferencia de buscar_juego_por_id, esta función:
     1. Busca por número de juego, no por ID único
     2. Está diseñada como endpoint API, retornando JSON en lugar de HTML
     3. Maneja el caso de juego no encontrado con un código HTTP apropiado
-    
+
     Args:
         id: El número de juego a buscar (parámetro de ruta)
-        
+
     Returns:
         Respuesta JSON con los datos del juego o un mensaje de error con código 404
     """
