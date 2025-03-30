@@ -47,16 +47,14 @@ document.addEventListener("DOMContentLoaded", function () {
       const gameHeader = document.createElement("div");
       gameHeader.className = "game-header";
       gameHeader.innerHTML = `
-        <span class="game-number">Juego #${
-          game.numero_juego || index + 1
-        }</span>
-        <span class="game-result">${game.equipo_ganador.nombre} vs ${
+      <span class="game-number">Juego #${game.numero_juego || index + 1}</span>
+      <span class="game-result">${game.equipo_ganador.nombre} vs ${
         game.equipo_ganador.nombre === game.equipo_1.nombre
           ? game.equipo_2.nombre
           : game.equipo_1.nombre
       }</span>
-        <span class="toggle-icon">▼</span>
-      `;
+      <span class="toggle-icon">▼</span>
+    `;
 
       // Manejar clic para expandir/contraer detalles
       gameHeader.addEventListener("click", function () {
@@ -89,81 +87,116 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Contenido HTML para el cuerpo
       let bodyHTML = `
-        <p><strong>ID del Juego:</strong> ${game.id_juego}</p>
-        
-        <!-- Tabla de Jugadores Destacados -->
-        <h4>Jugadores Destacados</h4>
-        <table>
-            <thead>
-                <tr>
-                    <th>Categoría</th>
-                    <th>Nombre</th>
-                    <th>Valor</th>
-                </tr>
-            </thead>
-            <tbody>`;
+      <p><strong>ID del Juego:</strong> ${game.id_juego}</p>
+      
+      <!-- Tabla de Jugadores Destacados -->
+      <h4>Jugadores Destacados</h4>
+      <table>
+          <thead>
+              <tr>
+                  <th>Categoría</th>
+                  <th>Nombre</th>
+                  <th>Valor</th>
+              </tr>
+          </thead>
+          <tbody>`;
 
       // Añadir jugador con más suerte si existe
       if (hasLuckyPlayer) {
         bodyHTML += `
-              <tr>
-                  <td>Jugador con más suerte</td>
-                  <td>${game.jugador_con_mas_suerte.nombre}</td>
-                  <td>${game.jugador_con_mas_suerte.suerte}</td>
-              </tr>`;
+            <tr>
+                <td>Jugador con más suerte</td>
+                <td>${game.jugador_con_mas_suerte.nombre}</td>
+                <td>${game.jugador_con_mas_suerte.suerte}</td>
+            </tr>`;
       }
 
       // Añadir jugador con más experiencia si existe
       if (hasExpPlayer) {
         bodyHTML += `
-              <tr>
-                  <td>Jugador con más experiencia</td>
-                  <td>${game.jugador_con_mas_experiencia.nombre}</td>
-                  <td>${game.jugador_con_mas_experiencia.experiencia}</td>
-              </tr>`;
+            <tr>
+                <td>Jugador con más experiencia</td>
+                <td>${game.jugador_con_mas_experiencia.nombre}</td>
+                <td>${game.jugador_con_mas_experiencia.experiencia}</td>
+            </tr>`;
       }
 
       // Si no hay ningún jugador destacado, mostrar mensaje
       if (!hasLuckyPlayer && !hasExpPlayer) {
         bodyHTML += `
-              <tr>
-                  <td colspan="3">No hay información de jugadores destacados</td>
-              </tr>`;
+            <tr>
+                <td colspan="3">No hay información de jugadores destacados</td>
+            </tr>`;
       }
 
       bodyHTML += `
-          </tbody>
-      </table>
-      
-      <!-- Tabla de Resultados de Equipos -->
-      <h4>Resultados del Juego</h4>
-      <table>
-          <tr>
-              <th>Equipo</th>
-              <th>Rondas Ganadas</th>
-              <th>Puntaje Total</th>
-          </tr>
-          <tr>
-              <td>${game.equipo_1.nombre}</td>
-              <td>${game.equipo_1.rondas_ganadas}</td>
-              <td>${game.equipo_1.puntaje_total}</td>
-          </tr>
-          <tr>
-              <td>${game.equipo_2.nombre}</td>
-              <td>${game.equipo_2.rondas_ganadas}</td>
-              <td>${game.equipo_2.puntaje_total}</td>
-          </tr>
-      </table>
-      
-      <!-- Ganador del juego -->
-      <p>
-          <strong>Ganador: </strong>
-          ${
-            game.equipo_ganador.nombre === "Empate"
-              ? "Empate"
-              : `${game.equipo_ganador.nombre} con ${game.equipo_ganador.puntaje} puntos`
-          }
-      </p>`;
+        </tbody>
+    </table>
+    
+    <!-- Tabla de Resultados de Equipos -->
+    <h4>Resultados del Juego</h4>
+    <table>
+        <tr>
+            <th>Equipo</th>
+            <th>Rondas Ganadas</th>
+            <th>Puntaje Total</th>
+        </tr>
+        <tr>
+            <td>${game.equipo_1.nombre}</td>
+            <td>${game.equipo_1.rondas_ganadas}</td>
+            <td>${game.equipo_1.puntaje_total}</td>
+        </tr>
+        <tr>
+            <td>${game.equipo_2.nombre}</td>
+            <td>${game.equipo_2.rondas_ganadas}</td>
+            <td>${game.equipo_2.puntaje_total}</td>
+        </tr>
+    </table>
+    
+    <!-- Ganador del juego -->
+    <p>
+        <strong>Ganador: </strong>
+        ${
+          game.equipo_ganador.nombre === "Empate"
+            ? "Empate"
+            : `${game.equipo_ganador.nombre} con ${game.equipo_ganador.puntaje} puntos`
+        }
+    </p>
+
+    <!-- Nueva sección: Estadísticas de género -->
+    <h4>Estadísticas de Género</h4>
+    <table>
+        <tr>
+            <th>Categoría</th>
+            <th>Valor</th>
+        </tr>
+        <tr>
+            <td>Género con más victorias</td>
+            <td>${game.genero_con_mas_victorias}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Victorias por género (este juego)</strong></td>
+        </tr>
+        <tr>
+            <td>Masculino (M)</td>
+            <td>${game.generos_victorias_totales.M}</td>
+        </tr>
+        <tr>
+            <td>Femenino (F)</td>
+            <td>${game.generos_victorias_totales.F}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Victorias por género (global)</strong></td>
+        </tr>
+        <tr>
+            <td>Masculino (M)</td>
+            <td>${game.generos_victorias_globales.M}</td>
+        </tr>
+        <tr>
+            <td>Femenino (F)</td>
+            <td>${game.generos_victorias_globales.F}</td>
+        </tr>
+    </table>`;
 
       gameBody.innerHTML = bodyHTML;
       gameBody.style.display = "none"; // Inicialmente oculto
@@ -173,8 +206,7 @@ document.addEventListener("DOMContentLoaded", function () {
       gameDetails.appendChild(gameBody);
       gameList.appendChild(gameDetails);
     });
-  } 
-
+  }
   // Función para actualizar una sección de estadísticas
   function updateStatisticsSection(elementId, data, title) {
     const container = document.getElementById(elementId);
