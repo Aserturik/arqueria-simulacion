@@ -1,10 +1,11 @@
-// static/js/scripts.js
 document.addEventListener("DOMContentLoaded", function () {
   // Variables para paginación
   let allGames = [];
+  let filteredGames = []; // Nueva variable para los juegos filtrados
   let currentPage = 1;
   let gamesPerPage = 10;
   let totalPages = 0;
+  let searchActive = false; // Para controlar si hay búsqueda activa
 
   // Inicialización y carga de datos
   fetchGames();
@@ -15,54 +16,98 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.json())
       .then((data) => {
         allGames = data;
+        filteredGames = data; // Inicialmente, filteredGames es igual a allGames
         totalPages = Math.ceil(allGames.length / gamesPerPage);
-        renderPagination();
-        renderGames(allGames, currentPage);
-        createSummaryStatistics(data);
+        
+        // Configurar eventos primero
         setupPaginationEvents();
+        
+        // Luego renderizar
+        renderPagination();
+        renderGames(filteredGames, currentPage);
       })
       .catch((error) => {
         console.error("Error cargando los datos:", error);
-        document.getElementById("game-loading").innerHTML =
-          '<p class="error">Error al cargar los datos. Por favor, intenta de nuevo más tarde.</p>';
+        const gameLoading = document.getElementById("game-loading");
+        if (gameLoading) {
+          gameLoading.innerHTML =
+            '<p class="error">Error al cargar los datos. Por favor, intenta de nuevo más tarde.</p>';
+        }
       });
   }
 
   // Función para configurar eventos de paginación
   function setupPaginationEvents() {
-    // Evento para cambiar juegos por página
-    document.getElementById('games-per-page').addEventListener('change', function() {
-      gamesPerPage = parseInt(this.value);
-      currentPage = 1; // Volver a la primera página
-      totalPages = Math.ceil(allGames.length / gamesPerPage);
-      renderPagination();
-      renderGames(allGames, currentPage);
-    });
+    const gamesPerPageSelect = document.getElementById('games-per-page');
+    const gameSearchInput = document.getElementById('game-search');
+    
+    // Verificar si los elementos existen antes de asignar eventos
+    if (gamesPerPageSelect) {
+      gamesPerPageSelect.addEventListener('change', function() {
+        gamesPerPage = parseInt(this.value);
+        currentPage = 1; // Volver a la primera página
+        
+        // Actualizar según si hay búsqueda activa o no
+        if (searchActive) {
+          totalPages = Math.ceil(filteredGames.length / gamesPerPage);
+          renderGames(filteredGames, currentPage);
+        } else {
+          totalPages = Math.ceil(allGames.length / gamesPerPage);
+          renderGames(allGames, currentPage);
+        }
+        
+        renderPagination();
+      });
+    } else {
+      console.error("Elemento 'games-per-page' no encontrado");
+    }
 
-    // Evento para el campo de búsqueda
-    document.getElementById('game-search').addEventListener('input', function() {
-      const searchTerm = this.value.toLowerCase();
-      if (searchTerm === '') {
-        renderGames(allGames, currentPage);
-        totalPages = Math.ceil(allGames.length / gamesPerPage);
-      } else {
-        const filteredGames = allGames.filter(game => 
-          game.numero_juego.toString().includes(searchTerm) ||
-          game.equipo_1.nombre.toLowerCase().includes(searchTerm) ||
-          game.equipo_2.nombre.toLowerCase().includes(searchTerm)
-        );
-        totalPages = Math.ceil(filteredGames.length / gamesPerPage);
-        renderGames(filteredGames, 1);
-      }
-      renderPagination();
-    });
+    if (gameSearchInput) {
+      gameSearchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        
+        if (searchTerm === '') {
+          // Si el término de búsqueda está vacío, mostrar todos los juegos
+          searchActive = false;
+          filteredGames = allGames;
+          totalPages = Math.ceil(allGames.length / gamesPerPage);
+          currentPage = 1;
+          renderGames(allGames, currentPage);
+        } else {
+          // Filtrar juegos por el término de búsqueda
+          searchActive = true;
+          filteredGames = allGames.filter(game => 
+            (game.numero_juego && game.numero_juego.toString().includes(searchTerm)) ||
+            (game.equipo_1 && game.equipo_1.nombre && game.equipo_1.nombre.toLowerCase().includes(searchTerm)) ||
+            (game.equipo_2 && game.equipo_2.nombre && game.equipo_2.nombre.toLowerCase().includes(searchTerm))
+          );
+          
+          totalPages = Math.ceil(filteredGames.length / gamesPerPage);
+          currentPage = 1; // Volver a la primera página al buscar
+          renderGames(filteredGames, currentPage);
+        }
+        
+        renderPagination();
+      });
+    } else {
+      console.error("Elemento 'game-search' no encontrado");
+    }
   }
 
   // Función para renderizar los controles de paginación
   function renderPagination() {
     const paginationContainer = document.getElementById('pagination-controls');
     
-    if (!paginationContainer) return;
+    if (!paginationContainer) {
+      console.error("Contenedor de paginación no encontrado");
+      return;
+    }
+    
+    // Si no hay páginas, mostrar mensaje y salir
+    if (totalPages === 0) {
+      paginationContainer.innerHTML = '';
+      return;
+    }
     
     let paginationHTML = '';
     
@@ -113,7 +158,13 @@ document.addEventListener("DOMContentLoaded", function () {
       button.addEventListener('click', function() {
         currentPage = parseInt(this.dataset.page);
         renderPagination();
-        renderGames(allGames, currentPage);
+        
+        // Renderizar juegos filtrados o todos según estado de búsqueda
+        if (searchActive) {
+          renderGames(filteredGames, currentPage);
+        } else {
+          renderGames(allGames, currentPage);
+        }
       });
     });
     
@@ -124,7 +175,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (currentPage > 1) {
           currentPage--;
           renderPagination();
-          renderGames(allGames, currentPage);
+          
+          // Renderizar juegos filtrados o todos según estado de búsqueda
+          if (searchActive) {
+            renderGames(filteredGames, currentPage);
+          } else {
+            renderGames(allGames, currentPage);
+          }
         }
       });
     }
@@ -135,7 +192,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (currentPage < totalPages) {
           currentPage++;
           renderPagination();
-          renderGames(allGames, currentPage);
+          
+          // Renderizar juegos filtrados o todos según estado de búsqueda
+          if (searchActive) {
+            renderGames(filteredGames, currentPage);
+          } else {
+            renderGames(allGames, currentPage);
+          }
         }
       });
     }
@@ -153,11 +216,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Limpiar la lista actual
-    gameList.innerHTML = "";
+    if (gameList) {
+      gameList.innerHTML = "";
+    } else {
+      console.error("Elemento 'game-list' no encontrado");
+      return;
+    }
 
     // Si no hay juegos, mostrar mensaje
     if (!games || games.length === 0) {
-      gameList.innerHTML = "<p>No hay juegos disponibles.</p>";
+      gameList.innerHTML = "<p>No hay juegos disponibles con los criterios de búsqueda actuales.</p>";
       if (infoText) infoText.textContent = "No hay juegos";
       return;
     }
@@ -172,11 +240,14 @@ document.addEventListener("DOMContentLoaded", function () {
       infoText.textContent = `Mostrando ${startIndex + 1}-${endIndex} de ${games.length} juegos`;
     }
 
-    // Crear lista de juegos
-    gamesOnPage.forEach((game, index) => {
+    // Resto del código para renderizar los juegos (sin cambios)
+    gamesOnPage.forEach((game) => {
       // Solo procesar si tiene información de identificación
       if (!game.id_juego || !game.equipo_1 || !game.equipo_2) return;
 
+      // [El resto del código para crear gameDetails permanece igual]
+      
+      // Creación de gameDetails, gameHeader, gameBody, etc.
       const gameDetails = document.createElement("div");
       gameDetails.className = "game-details";
       gameDetails.id = `game-${game.id_juego}`;
@@ -344,10 +415,5 @@ document.addEventListener("DOMContentLoaded", function () {
       gameDetails.appendChild(gameBody);
       gameList.appendChild(gameDetails);
     });
-  }
-
-  // Función para actualizar una sección de estadísticas
-  function updateStatisticsSection(elementId, data, title) {
-    // ... el código existente se mantiene igual ...
   }
 });
