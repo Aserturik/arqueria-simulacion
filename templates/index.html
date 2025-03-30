@@ -1,13 +1,209 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Simulación de Arquería</title>
+  <meta charset="UTF-8">
+  <title>Simulación de Arquería</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #2c3e50, #4ca1af);
+      color: white;
+      text-align: center;
+      padding: 50px 20px;
+      min-height: 100vh;
+      margin: 0;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      margin-bottom: 40px;
+    }
+    
+    button {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    button:hover {
+      background-color: #c0392b;
+      transform: scale(1.05);
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Estilos para el indicador de progreso */
+    .progress-container {
+      display: none;
+      margin-top: 30px;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 30px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(to right, #27ae60, #2ecc71);
+      width: 0%;
+      transition: width 0.5s;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .progress-text {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    
+    .spinner {
+      border: 5px solid rgba(255, 255, 255, 0.3);
+      border-top: 5px solid #2ecc71;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .tiempo-estimado {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Simulación de Arquería</h1>
-    <form action="{{ url_for('jugar') }}" method="post">
-        <button type="submit">Iniciar Juego</button>
-    </form>
+  <div class="container">
+    <h1>🏹 Simulación de Arquería 🏹</h1>
+    
+    <!-- Contenedor para el formulario y el botón -->
+    <div id="inicio-container">
+      <button id="iniciar-btn" type="button">¡Iniciar Simulación Ahora!</button>
+    </div>
+    
+    <!-- Contenedor para mostrar el progreso -->
+    <div id="progress-container" class="progress-container">
+      <div class="spinner"></div>
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill">0%</div>
+      </div>
+      <div id="progress-text" class="progress-text">Iniciando simulación...</div>
+      <div id="tiempo-estimado" class="tiempo-estimado">Tiempo estimado: calculando...</div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const iniciarBtn = document.getElementById('iniciar-btn');
+      const inicioContainer = document.getElementById('inicio-container');
+      const progressContainer = document.getElementById('progress-container');
+      const progressFill = document.getElementById('progress-fill');
+      const progressText = document.getElementById('progress-text');
+      const tiempoEstimado = document.getElementById('tiempo-estimado');
+      
+      iniciarBtn.addEventListener('click', function() {
+        // Ocultar el botón y mostrar el progreso
+        inicioContainer.style.display = 'none';
+        progressContainer.style.display = 'block';
+        
+        let tiempoInicio = Date.now();
+        let intervalId;
+        
+        // Función para actualizar el tiempo estimado
+        function actualizarTiempoEstimado(porcentaje) {
+          if (porcentaje > 0) {
+            const tiempoTranscurrido = (Date.now() - tiempoInicio) / 1000; // en segundos
+            const tiempoTotal = (tiempoTranscurrido / porcentaje) * 100;
+            const tiempoRestante = tiempoTotal - tiempoTranscurrido;
+            
+            let mensaje = '';
+            if (tiempoRestante > 60) {
+              mensaje = `Tiempo restante: ${Math.ceil(tiempoRestante / 60)} minutos`;
+            } else {
+              mensaje = `Tiempo restante: ${Math.ceil(tiempoRestante)} segundos`;
+            }
+            
+            tiempoEstimado.textContent = mensaje;
+          }
+        }
+        
+        // Configurar un intervalo para verificar el progreso
+        intervalId = setInterval(function() {
+          fetch('/progreso_simulacion')
+            .then(response => response.json())
+            .then(data => {
+              const porcentaje = data.progreso;
+              
+              // Actualizar la barra de progreso
+              progressFill.style.width = `${porcentaje}%`;
+              progressFill.textContent = `${porcentaje}%`;
+              
+              // Actualizar el texto de progreso
+              progressText.textContent = `Simulando: ${data.juegos_completados} de ${data.total_juegos} juegos`;
+              
+              // Actualizar tiempo estimado
+              actualizarTiempoEstimado(porcentaje);
+              
+              // Si está completo, redirigir a la página de resultados
+              if (porcentaje >= 100) {
+                clearInterval(intervalId);
+                progressText.textContent = 'Simulación completa. Redirigiendo...';
+                setTimeout(() => {
+                  window.location.href = '/resultados';
+                }, 1000);
+              }
+            })
+            .catch(error => {
+              console.error('Error al verificar el progreso:', error);
+            });
+        }, 1000); // Consultar cada segundo
+        
+        // Iniciar la simulación
+        fetch('/iniciar_simulacion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(response => {
+          // La simulación se inició correctamente
+          console.log('Simulación iniciada');
+        })
+        .catch(error => {
+          clearInterval(intervalId);
+          progressText.textContent = `Error: ${error.message}`;
+          console.error('Error al iniciar la simulación:', error);
+        });
+      });
+    });
+  </script>
 </body>
 </html>
