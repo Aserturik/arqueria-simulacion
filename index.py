@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, session, send_file, jsonify
+from flask import Flask, render_template, redirect, url_for, session, send_file, jsonify, request
 from simulacion.juego import Juego
 from simulacion.equipo import Equipo
 import numpy as np
@@ -8,24 +8,12 @@ import time
 app = Flask(__name__)
 app.secret_key = "tu_clave_secreta"
 
+# Variables globales
 equipo_1 = Equipo("Los tiguere", 5)
 equipo_2 = Equipo("Los jaguares", 5)
+todos_resultados = []  # Variable global para almacenar todos los resultados
 
 JSON_FILE = "simulacion_data.json"
-
-# Deshabilitar prints para mejor rendimiento
-DEBUG_MODE = False
-original_print = print
-
-
-def silent_print(*args, **kwargs):
-    if DEBUG_MODE:
-        original_print(*args, **kwargs)
-
-
-# Reemplazar la función print en todo el programa
-print = silent_print
-
 
 def convert_numpy(obj):
     if isinstance(obj, dict):
@@ -38,6 +26,31 @@ def convert_numpy(obj):
         return obj
 
 
+# Función para cargar resultados al iniciar la aplicación
+def cargar_resultados():
+    global todos_resultados
+    try:
+        with open("resultados_acumulados.json", "r") as f:
+            todos_resultados = json.load(f)
+        print(f"Cargados {len(todos_resultados)} juegos de resultados")
+    except (FileNotFoundError, json.JSONDecodeError):
+        todos_resultados = []
+        print("No se encontraron resultados previos o el archivo está corrupto")
+
+
+# Cargar resultados al iniciar
+cargar_resultados()
+
+
+# Función para buscar un juego por ID
+def buscar_juego_por_id(juego_id):
+    global todos_resultados
+    for juego in todos_resultados:
+        if str(juego["id_juego"]) == str(juego_id):
+            return juego
+    return None
+
+
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
@@ -46,18 +59,18 @@ def index():
 @app.route("/jugar", methods=["POST"])
 def jugar():
     tiempo_inicio = time.time()
-    original_print("Iniciando simulación...")
+    print("Iniciando simulación...")
 
     total_juegos = 200
-    global equipo_1, equipo_2
+    global equipo_1, equipo_2, todos_resultados
+    
+    # Reiniciar la lista de resultados
     todos_resultados = []
     ultimo_juego = None
 
     for i in range(total_juegos):
         if i % 1000 == 0:
-            original_print(
-                f"Progreso: {i}/{total_juegos} juegos ({i/total_juegos*100:.1f}%)"
-            )
+            print(f"Progreso: {i}/{total_juegos} juegos ({i/total_juegos*100:.1f}%)")
 
         juego = Juego(equipo_1, equipo_2, num_rondas=10, juego_actual=i + 1)
         juego.jugar_juego_completo()
@@ -118,7 +131,7 @@ def jugar():
         json.dump(todos_resultados, f)
 
     tiempo_total = time.time() - tiempo_inicio
-    original_print(f"Simulación completada en {tiempo_total:.2f} segundos")
+    print(f"Simulación completada en {tiempo_total:.2f} segundos")
 
     session["game_id"] = juego.id_juego
 
@@ -130,17 +143,30 @@ def jugar():
 def resultados():
     # Obtener el ID del juego de la sesión
     game_id = session.get("game_id", None)
-    global equipo_1, equipo_2
+    global equipo_1, equipo_2, todos_resultados
 
-    # Cargar datos del archivo JSON
+    # Verificar si se solicita un juego específico
+    juego_id_solicitado = request.args.get('juego_id', None)
+    
     try:
-        with open("resultados_acumulados.json", "r") as f:
-            todos_resultados = json.load(f)
+        # Si no hay resultados en memoria, cargarlos del archivo
+        if not todos_resultados:
+            cargar_resultados()
 
-        # Obtener el último juego
-        if todos_resultados:
-            ultimo_juego = todos_resultados[-1]
+        # Determinar qué juego mostrar
+        if juego_id_solicitado:
+            juego_especifico = buscar_juego_por_id(juego_id_solicitado)
+            if juego_especifico:
+                ultimo_juego = juego_especifico
+            else:
+                # Si no se encuentra, usar el último
+                ultimo_juego = todos_resultados[-1] if todos_resultados else None
+        else:
+            # Si no se solicita un juego específico, usar el último
+            ultimo_juego = todos_resultados[-1] if todos_resultados else None
             
+        # Procesar el juego seleccionado
+        if ultimo_juego:
             # Crear datos para pasar a la plantilla
             simulacion_data = {
                 "id_juego": ultimo_juego["id_juego"],
@@ -199,8 +225,9 @@ def resultados():
             }
             resultado_final = "No hay resultados disponibles"
 
-    except (FileNotFoundError, json.JSONDecodeError):
-        # Manejar error si el archivo no existe o está corrupto
+    except Exception as e:
+        # Manejar error general
+        print(f"Error en resultados: {str(e)}")
         simulacion_data = {
             "id_juego": game_id,
             "equipo1": {
@@ -216,13 +243,20 @@ def resultados():
             "historial_puntajes": [],
             "total_juegos": 0,
         }
-        resultado_final = "Error al cargar resultados"
+        resultado_final = f"Error al cargar resultados: {str(e)}"
 
     return render_template(
         "resultados.html",
         simulacion_data=simulacion_data,
         resultado_final=resultado_final,
     )
+
+
+# Nueva ruta para buscar un juego específico por ID
+@app.route("/buscar_juego", methods=["GET"])
+def buscar_juego():
+    juego_id = request.args.get('id', '')
+    return redirect(url_for('resultados', juego_id=juego_id))
 
 
 @app.route("/resultados_acumulados.json")
