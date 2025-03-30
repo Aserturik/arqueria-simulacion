@@ -73,9 +73,6 @@ class Jugador:
             self.resistencia_actual = self.resistencia_inicial - max(
                 1, self.cansancio_acumulado - 1
             )
-            print(
-                f"{self.nombre} tiene beneficio de experiencia: resistencia {self.resistencia_actual}"
-            )
         else:
             self.resistencia_actual = (
                 self.resistencia_inicial - self.cansancio_acumulado
@@ -93,14 +90,12 @@ class Jugador:
 
         # Actualizamos la resistencia actual para la lógica de la ronda
         self.resistencia_actual = self.resistencia
-        print("resistencia al final de la ronda: " + self.resistencia)
         self.experiencia += 1
 
     def realizar_tiro(self):
         if self.resistencia_actual >= 5:
             self.resistencia_actual -= 5
             self.tiros_realizados += 1
-            print("lancé y tengo resistencia " + self.resistencia_actual)
             # Calcula el puntaje basado en resistencia, experiencia y suerte
             return True
         else:

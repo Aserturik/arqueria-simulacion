@@ -1,17 +1,8 @@
-from flask import (
-    Flask,
-    render_template,
-    redirect,
-    url_for,
-    session,
-    send_file,
-)
+from flask import Flask, render_template, redirect, url_for, session, send_file, jsonify
 from simulacion.juego import Juego
 from simulacion.equipo import Equipo
 import numpy as np
 import json
-import sys
-import io
 import time
 
 app = Flask(__name__)
@@ -57,7 +48,7 @@ def jugar():
     equipo_1 = Equipo("Los tiguere", 5)
     equipo_2 = Equipo("Los jaguares", 5)
 
-    total_juegos = 200
+    total_juegos = 20000
     todos_resultados = []
     ultimo_juego = None
 

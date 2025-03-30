@@ -39,19 +39,6 @@ class Equipo:
         random.shuffle(jugadores)
         return jugadores
 
-    def mostrar_jugadores(self):
-        """Muestra los jugadores del equipo con su genero"""
-        print("")
-        print(f"Jugadores del equipo {self.nombre}")
-        print("")
-        for jugador in self.jugadores:
-            # si el jugador es genero F, mostrar el mujer
-            if jugador.genero == "F":
-                print(f"- {jugador.nombre} (GENERO: MUJER)")
-            else:
-                print(f"- {jugador.nombre} (GENERO: HOMBRE)")
-        print("")
-
     def realizar_ronda(self):
         puntaje_ronda = 0
         for jugador in self.jugadores:

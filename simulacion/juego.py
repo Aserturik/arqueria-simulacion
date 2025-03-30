@@ -25,7 +25,6 @@ class Juego:
         ronda = Ronda(self.ronda_actual, self.equipo1, self.equipo2, self.blanco)
         resultado = ronda.jugar()
         self.historial_rondas.append(resultado)
-        # self._mostrar_resultados_ronda(resultado)
 
     def jugar_juego_completo(self):
         for jugador in self.equipo1.jugadores + self.equipo2.jugadores:
@@ -40,10 +39,6 @@ class Juego:
         self.determinar_jugador_con_mas_experiencia()
         self._finalizar_juego()
 
-    def _mostrar_resultados_ronda(self, resultado):
-        print(f"\n--- RESULTADOS RONDA {self.ronda_actual} ---")
-        print(f"Ganador: {resultado['ganador_individual']}")
-
     def _finalizar_juego(self):
         self.equipo_ganador_del_juego()
         self.reiniciar_equipos()
@@ -53,31 +48,17 @@ class Juego:
             self.equipo1.puntaje_juego += ronda["equipo 1"]["puntaje"]
             self.equipo2.puntaje_juego += ronda["equipo 2"]["puntaje"]
 
-        print("\n--- RESULTADO DEL JUEGO ---")
         if self.equipo1.puntaje_juego > self.equipo2.puntaje_juego:
             self.equipo1.juegos_ganados += 1
             self.equipo_ganador_juego = self.equipo1
-            print(
-                f"¡{self.equipo1.nombre} gana el juego! con un puntaje de {self.equipo1.puntaje_juego} puntos."
-            )
-            print(
-                f"¡{self.equipo2.nombre} pierde el juego! con un puntaje de {self.equipo2.puntaje_juego} puntos."
-            )
         elif self.equipo2.puntaje_juego > self.equipo1.puntaje_juego:
             self.equipo2.juegos_ganados += 1
             self.equipo_ganador_juego = self.equipo2
-            print(
-                f"¡{self.equipo2.nombre} gana el juego! con un puntaje de {self.equipo2.puntaje_juego} puntos."
-            )
-            print(
-                f"¡{self.equipo1.nombre} pierde el juego! con un puntaje de {self.equipo1.puntaje_juego} puntos."
-            )
         else:
             # Empate en el juego
             self.equipo1.juegos_ganados += 0
             self.equipo2.juegos_ganados += 0
             self.equipo_ganador_juego = None
-            print("¡Empate en el juego!")
 
     def reiniciar_equipos(self):
         # se reinician las estadísticas de los equipos
@@ -94,8 +75,6 @@ class Juego:
                 jugador.puntaje_total - jugador.puntaje_juego_anterior
             )
             puntos_por_jugador[jugador.nombre] = jugador.puntaje_juego_actual
-
-        print(puntos_por_jugador)
 
     def determinar_jugador_con_mas_suerte(self):
         # se busca en cada ronda el jugador con más suerte
@@ -135,9 +114,6 @@ class Juego:
             )
             # Guarda la experiencia actual antes de que se reinicie
             self.experiencia_maxima = self.jugador_con_mas_experiencia.experiencia
-            print(
-                f"Jugador con más experiencia: {self.jugador_con_mas_experiencia.nombre} con {self.jugador_con_mas_experiencia.experiencia} puntos"
-            )
         else:
             self.jugador_con_mas_experiencia = "No determinado"
             self.experiencia_maxima = 10
