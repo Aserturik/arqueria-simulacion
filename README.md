@@ -70,7 +70,7 @@ venv\Scripts\activate     # En Windows
 ### 3. Instalar dependencias 
 
 ```bash
-pip install flask matplotlib numpy names
+pip install flask matplotlib numpy names scipy
 ```
 
 ### 4. Ejecutar la aplicación
