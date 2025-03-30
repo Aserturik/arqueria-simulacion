@@ -1,12 +1,24 @@
+"""
+Módulo que implementa la prueba de promedios para validar secuencias de números aleatorios.
+
+Esta prueba verifica que el promedio de la secuencia se encuentre dentro de los
+límites esperados para una distribución uniforme.
+
+Relaciones:
+- Consume números generados por implementaciones de PRNG
+- Es la prueba más básica, complementa a KsTest y PokerTest
+"""
+
 from statistics import mean
 from math import sqrt
 from scipy.stats import norm
 import matplotlib.pyplot as plt
+from typing import List, Optional
 
 # Clase que implementa la prueba de promedio para una secuencia de números
 class AverageTest:
     # Inicializa la instancia con una lista de números
-    def __init__(self, numbers):
+    def __init__(self, numbers: List[float]):
         self.numbers = numbers  # Lista de números ingresados
         self.average = 0
         self.alpha = 0.05

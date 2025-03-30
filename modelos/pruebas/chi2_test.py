@@ -1,4 +1,3 @@
-from typing import Any
 from scipy.stats import chi2
 import numpy as np
 import matplotlib.pyplot as plt

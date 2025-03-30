@@ -1,8 +1,20 @@
+"""
+Módulo que implementa la prueba de Kolmogorov-Smirnov para validar secuencias de números aleatorios.
+
+La prueba KS compara la distribución empírica de los números generados
+con la distribución teórica esperada.
+
+Relaciones:
+- Consume números generados por implementaciones de PRNG
+- Complementa a PokerTest y AverageTest en la validación de secuencias
+"""
+
 from statistics import mean
 from scipy import stats
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 import numpy as np
+from typing import List, Tuple, Optional
 
 class KsTest:
     """

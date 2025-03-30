@@ -1,3 +1,15 @@
+"""
+Módulo base para generadores de números pseudoaleatorios (PRNG).
+
+Este módulo define la interfaz base que deben implementar todos los generadores
+de números pseudoaleatorios en el sistema. Proporciona métodos útiles que construyen
+sobre el método básico random().
+
+Relaciones:
+- Es la clase base para implementaciones específicas de PRNGs
+- Sus números generados son consumidos por los módulos de prueba (AverageTest, KsTest, PokerTest)
+"""
+
 from abc import ABC, abstractmethod
 from typing import List, Any, Optional, Sequence
 import math

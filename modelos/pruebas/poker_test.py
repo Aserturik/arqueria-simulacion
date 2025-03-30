@@ -1,7 +1,20 @@
+"""
+Módulo que implementa la prueba de póker para validar secuencias de números aleatorios.
+
+La prueba de póker analiza patrones en los dígitos de los números generados,
+clasificándolos en diferentes "manos" como en el juego de póker.
+
+Relaciones:
+- Consume números generados por implementaciones de PRNG
+- Puede usarse en conjunto con KsTest y AverageTest para validación completa
+"""
+
 from numpy import mean, var
 import numpy as np
 import scipy.stats as st
 import matplotlib.pyplot as plt
+from typing import List, Optional
+
 
 class PokerTest:
 
