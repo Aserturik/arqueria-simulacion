@@ -268,6 +268,19 @@ def serve_json():
 def graficas():
     return render_template("graficas.html")
 
+@app.route("/todos_juegos", methods=["GET"])
+def todos_juegos():
+    global todos_resultados
+    return jsonify(todos_resultados)
+
+@app.route("/todos_juegos/<int:id>", methods=["GET"])
+def juego_por_id(id):
+    global todos_resultados
+    juego = next((j for j in todos_resultados if j["numero_juego"] == id), None)
+    if juego:
+        return jsonify(juego)
+    else:
+        return jsonify({"error": "Juego no encontrado"}), 404
 
 if __name__ == "__main__":
     app.run(debug=True)
