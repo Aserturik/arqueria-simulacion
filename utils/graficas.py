@@ -4,9 +4,7 @@ import io
 import base64
 import numpy as np
 import json
-import random
-from flask import Response
-import os
+from modelos.random_wrapper import uniform  # Añadir uniform a los imports
 matplotlib.use('Agg')  # Configuración para entornos sin GUI
 
 def generar_grafica_puntos_jugadores():
@@ -108,13 +106,6 @@ def generar_grafica_puntos_jugadores():
 def distribuir_puntos(total, num_jugadores):
     """
     Distribuye los puntos entre jugadores con cierta variabilidad.
-    
-    Args:
-        total: Puntos totales a distribuir
-        num_jugadores: Número de jugadores
-        
-    Returns:
-        list: Lista con los puntos asignados a cada jugador
     """
     if total == 0:
         return [0] * num_jugadores
@@ -126,7 +117,7 @@ def distribuir_puntos(total, num_jugadores):
     resto = total * 0.8
     
     # Generar factores de distribución aleatorios
-    factores = [random.uniform(0.7, 1.3) for _ in range(num_jugadores)]
+    factores = [uniform(0.7, 1.3) for _ in range(num_jugadores)]
     suma_factores = sum(factores)
     
     # Normalizar factores y distribuir resto
