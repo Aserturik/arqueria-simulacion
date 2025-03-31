@@ -153,6 +153,51 @@ table tr:nth-child(even) {
   padding-bottom: 5px;
 }
 
+/* Estilos para botones de acción */
+.botones-accion {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: #1890ff;
+    color: white;
+    box-shadow: 0 2px 4px rgba(24, 144, 255, 0.2);
+}
+
+.btn-primary:hover {
+    background-color: #40a9ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(24, 144, 255, 0.3);
+}
+
+.btn-secondary {
+    background-color: #f0f0f0;
+    color: #666;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
 /* Estado de carga */
 .loading {
   text-align: center;
