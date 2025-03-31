@@ -61,7 +61,8 @@ arqueria-simulacion/
 El proyecto implementa su propio sistema de generación de números pseudoaleatorios para garantizar la calidad y reproducibilidad de las simulaciones. El sistema incluye:
 
 ### Generador Congruencial Lineal
-- Implementa el método congruencial lineal: X_(n+1) = (a * X_n + c) mod m
+
+- Implementa el método congruencial lineal: X\_(n+1) = (a \* X_n + c) mod m
 - Utiliza parámetros optimizados:
   - m = 2^31 - 1 (Número primo de Mersenne)
   - a = 1597 (multiplicador)
@@ -69,7 +70,9 @@ El proyecto implementa su propio sistema de generación de números pseudoaleato
 - Garantiza un período máximo y buenas propiedades estadísticas
 
 ### Validación Estadística
+
 El generador ha sido validado mediante diversas pruebas estadísticas:
+
 - Prueba Chi-cuadrado para uniformidad
 - Prueba de Kolmogorov-Smirnov
 - Prueba de varianza
@@ -78,6 +81,7 @@ El generador ha sido validado mediante diversas pruebas estadísticas:
 - Reproducibilidad con semillas
 
 ### Integración con la Simulación
+
 - Wrapper compatible con la interfaz del módulo `random` de Python
 - Generación de valores con distribuciones específicas (normal, uniforme)
 - Métodos para selección aleatoria, mezcla y muestreo
@@ -85,6 +89,7 @@ El generador ha sido validado mediante diversas pruebas estadísticas:
 ## Instalación y Ejecución
 
 ### Requisitos Previos
+
 - Python 3.8 o superior
 - pip (gestor de paquetes de Python)
 
@@ -107,7 +112,7 @@ venv\Scripts\activate     # En Windows
 ### 3. Instalar dependencias
 
 ```bash
-pip install -r requirements.txt
+pip install flask matplotlib numpy names scipy
 ```
 
 ### 4. Ejecutar la aplicación
@@ -121,16 +126,19 @@ La aplicación estará disponible en http://localhost:5000/
 ## Funcionamiento de la Simulación
 
 1. Inicialización:
+
    - Se crean dos equipos con 5 jugadores cada uno
    - Cada jugador recibe atributos aleatorios de resistencia y suerte
 
 2. Desarrollo del Juego:
+
    - Se simulan 20000 juegos consecutivos
    - Cada juego consta de 10 rondas
    - Los tiros se generan usando el generador pseudoaleatorio validado
    - La precisión del tiro depende de las habilidades del jugador
 
 3. Puntuación:
+
    - Los puntos se asignan según la distancia al centro del blanco
    - Se consideran factores como la suerte y la fatiga del jugador
 
